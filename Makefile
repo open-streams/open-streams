@@ -25,7 +25,7 @@ IMAGE_BUILD = $(shell echo "$(BUILD_TYPE)" | tr '[:upper:]' '[:lower:]')
 
 .PHONY: all info platform runtime test format lint image clean
 
-all: info platform runtime
+all: prepare info platform runtime
 
 builder:
 	@make -C docker builder
@@ -38,61 +38,61 @@ prepare:
 
 ifeq ($(DOCKER),)
 
-platform: prepare
+platform:
 	@docker run -it --rm \
 		-v $(PWD):$(PWD):rw \
 		-v $(HOME)/.m2:/home/builder/.m2:rw \
 		$(DOCKER_REGISTRY)/$(DOCKER_NAMESPACE)/streams-builder:6.$(shell uname -m) \
 		doas $(shell id -u) $(shell id -g) $(PWD) \
-	  make platform
+	  make NPROC=$(NPROC) platform
 
-platform-test: prepare
+platform-test:
 	@docker run -it --rm \
 		-v $(PWD):$(PWD):rw \
 		-v $(HOME)/.m2:/home/builder/.m2:rw \
 		$(DOCKER_REGISTRY)/$(DOCKER_NAMESPACE)/streams-builder:6.$(shell uname -m) \
 		doas $(shell id -u) $(shell id -g) $(PWD) \
-		make platform-test
+		make NPROC=$(NPROC) platform-test
 
-runtime: prepare
+runtime:
 	@docker run -it --rm \
 		-v $(PWD):$(PWD):rw \
 		-v $(HOME)/.m2:/home/builder/.m2:rw \
 		$(DOCKER_REGISTRY)/$(DOCKER_NAMESPACE)/streams-builder:6.$(shell uname -m) \
 		doas $(shell id -u) $(shell id -g) $(PWD) \
-		make BUILD_TYPE=$(BUILD_TYPE) runtime
+		make BUILD_TYPE=$(BUILD_TYPE) NPROC=$(NPROC) runtime
 
-runtime-doc: prepare
+runtime-doc:
 	@docker run -it --rm \
 		-v $(PWD):$(PWD):rw \
 		-v $(HOME)/.m2:/home/builder/.m2:rw \
 		$(DOCKER_REGISTRY)/$(DOCKER_NAMESPACE)/streams-builder:6.$(shell uname -m) \
 		doas $(shell id -u) $(shell id -g) $(PWD) \
-		make BUILD_TYPE=$(BUILD_TYPE) runtime-doc
+		make BUILD_TYPE=$(BUILD_TYPE) NPROC=$(NPROC) runtime-doc
 
-runtime-test: prepare
+runtime-test:
 	@docker run -it --rm \
 		-v $(PWD):$(PWD):rw \
 		-v $(HOME)/.m2:/home/builder/.m2:rw \
 		$(DOCKER_REGISTRY)/$(DOCKER_NAMESPACE)/streams-builder:6.$(shell uname -m) \
 		doas $(shell id -u) $(shell id -g) $(PWD) \
-		make BUILD_TYPE=$(BUILD_TYPE) runtime-test
+		make BUILD_TYPE=$(BUILD_TYPE) NPROC=$(NPROC) runtime-test
 
-format: prepare
+format:
 	@docker run -it --rm \
 		-v $(PWD):$(PWD):rw \
 		-v $(HOME)/.m2:/home/builder/.m2:rw \
 		$(DOCKER_REGISTRY)/$(DOCKER_NAMESPACE)/streams-builder:6.$(shell uname -m) \
 		doas $(shell id -u) $(shell id -g) $(PWD) \
-		make BUILD_TYPE=$(BUILD_TYPE) format
+		make BUILD_TYPE=$(BUILD_TYPE) NPROC=$(NPROC) format
 
-lint: prepare
+lint:
 	@docker run -it --rm \
 		-v $(PWD):$(PWD):rw \
 		-v $(HOME)/.m2:/home/builder/.m2:rw \
 		$(DOCKER_REGISTRY)/$(DOCKER_NAMESPACE)/streams-builder:6.$(shell uname -m) \
 		doas $(shell id -u) $(shell id -g) $(PWD) \
-		make BUILD_TYPE=$(BUILD_TYPE) lint
+		make BUILD_TYPE=$(BUILD_TYPE) NPROC=$(NPROC) lint
 
 else
 
