@@ -236,7 +236,7 @@ public final class XLIFF2ICUConverter {
             + "                           Cannot be used in conjunction with --target-only.\n"
             + "-r or --make-source-root   produce root bundle from source elements.\n"
             + "-x or --xliff-1.0          source file is XLIFF 1.0"
-            + "example: com.ibm.icu.dev.tool.com.ibm.icu.dev.tool.localeconverter.XLIFF2ICUConverter -t <optional argument> -s xxx -d yyy myResources.xlf");
+            + "example: com.ibm.icu.dev.tool.localeconverter.XLIFF2ICUConverter -t <optional argument> -s xxx -d yyy myResources.xlf");
     System.exit(-1);
   }
 
@@ -1318,7 +1318,7 @@ public final class XLIFF2ICUConverter {
             + LINESEP
             + "// *"
             + LINESEP
-            + "// * Tool: com.ibm.icu.dev.tool.com.ibm.icu.dev.tool.localeconverter.XLIFF2ICUConverter.java"
+            + "// * Tool: com.ibm.icu.dev.tool.localeconverter.XLIFF2ICUConverter.java"
             + LINESEP
             + "// * Date & Time: {0,date,MM/dd/yyyy hh:mm:ss a z}"
             + LINESEP

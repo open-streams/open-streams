@@ -114,7 +114,7 @@ elsif ($PRODUCT_NAME)
 }
 elsif (defined($VERSION))
 {
-    my $vproperties_file = abs_path(dirname($0)) . "/../etc/release.properties";
+    my $vproperties_file = abs_path(dirname($0)) . "/../src/etc/release.properties";
     my $vproperties =`cat $vproperties_file`;
     $vproperties =~ m/streams.version\s*=\s*(\d+)\.(\d+)\.(\d+)\.(\d+)/;
     my ($v, $r, $m, $l) = ($1, $2, $3, $4);

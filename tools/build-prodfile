@@ -80,7 +80,7 @@ else {
 }
 
 if (!$TEMPLATEFILE) {
-    $TEMPLATEFILE = dirname($0) . "/../etc/.product.tmpl";
+    $TEMPLATEFILE = dirname($0) . "/../src/etc/.product.tmpl";
 }
 else {
     if (! -f $TEMPLATEFILE) {

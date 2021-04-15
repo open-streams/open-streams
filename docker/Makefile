@@ -14,14 +14,17 @@
 # limitations under the License.
 #
 
-DOCKER_ARCH ?= $(shell uname -m)
-DOCKER_NAMESPACE ?= openstreams
-DOCKER_REGISTRY ?= docker.io
-
 # Build parameters
 #
 BUILD_TYPE ?= Debug
 NPROC ?= $(shell ./tools/cpucount)
+
+# Docker parameters
+#
+DOCKER_ARCH ?= $(shell uname -m)
+DOCKER_BUILD ?= $(shell echo "$(BUILD_TYPE)" | tr '[:upper:]' '[:lower:]')
+DOCKER_NAMESPACE ?= openstreams
+DOCKER_REGISTRY ?= docker.io
 
 # Select the proper centos base image
 #
@@ -74,10 +77,10 @@ runtime: \
 	@echo "[BLD] $*";
 	@$(MAKE) --no-print-directory -C packages/$* \
 		DOCKER_ARCH=$(DOCKER_ARCH) \
+		DOCKER_BUILD=$(DOCKER_BUILD) \
 		DOCKER_IMAGE=$(CENTOS_IMAGE) \
 		DOCKER_NAMESPACE=$(DOCKER_NAMESPACE) \
 		DOCKER_REGISTRY=$(DOCKER_REGISTRY) \
-		BUILD_TYPE=$(BUILD_TYPE) \
 		NPROC=$(NPROC) \
 		build
 
@@ -85,10 +88,10 @@ runtime: \
 	@echo "[PSH] $*"
 	@$(MAKE) --no-print-directory -C packages/$* \
 		DOCKER_ARCH=$(DOCKER_ARCH) \
+		DOCKER_BUILD=$(DOCKER_BUILD) \
 		DOCKER_IMAGE=$(CENTOS_IMAGE) \
 		DOCKER_NAMESPACE=$(DOCKER_NAMESPACE) \
 		DOCKER_REGISTRY=$(DOCKER_REGISTRY) \
-		BUILD_TYPE=$(BUILD_TYPE) \
 		push
 
 # Image rules
@@ -100,10 +103,10 @@ runtime: \
 	@echo "[BLD] $*";
 	@$(MAKE) --no-print-directory -C images/$* \
 		DOCKER_ARCH=$(DOCKER_ARCH) \
+		DOCKER_BUILD=$(DOCKER_BUILD) \
 		DOCKER_IMAGE=$(CENTOS_IMAGE) \
 		DOCKER_NAMESPACE=$(DOCKER_NAMESPACE) \
 		DOCKER_REGISTRY=$(DOCKER_REGISTRY) \
-		BUILD_TYPE=$(BUILD_TYPE) \
 		NPROC=$(NPROC) \
 		build
 
@@ -111,8 +114,8 @@ runtime: \
 	@echo "[PSH] $*"
 	@$(MAKE) --no-print-directory -C images/$* \
 		DOCKER_ARCH=$(DOCKER_ARCH) \
+		DOCKER_BUILD=$(DOCKER_BUILD) \
 		DOCKER_IMAGE=$(CENTOS_IMAGE) \
 		DOCKER_NAMESPACE=$(DOCKER_NAMESPACE) \
 		DOCKER_REGISTRY=$(DOCKER_REGISTRY) \
-		BUILD_TYPE=$(BUILD_TYPE) \
 		push

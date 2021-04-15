@@ -324,7 +324,7 @@ sub runConverter($$$$)
     my $options = ($isRoot) ? "-c -r" : "-t";
     my $srcFile = basename($file);
     my $srcPath = dirname($file);
-    my $converter = "com.ibm.icu.dev.tool.com.ibm.icu.dev.tool.localeconverter.XLIFF2ICUConverter";
+    my $converter = "com.ibm.icu.dev.tool.localeconverter.XLIFF2ICUConverter";
     my $cmdArgs = "-cp ${classPath} ${converter} ${options} -d ";
     $cmdArgs .= SPL::Helper::SPLEscapePath($tempDir);
     $cmdArgs .= " -s ";
@@ -429,10 +429,10 @@ sub computePaths($)
 {
     my ($thisScript) = @_;
     my $dist = realpath(dirname($thisScript));
-    my $classPath = $dist . "/../../../ext/lib/xliff.jar";
+    my $classPath = $dist . "/../../../ext/lib/icu4j-tools-68.2.jar";
     my $genrb = "/usr/local/bin/genrb";
     my $pkgData = "/usr/local/bin/pkgdata";
-    my $schemaPath = $dist . "/../../../ext/etc/xliff";
+    my $schemaPath = $dist . "/../../../etc/xliff";
     return ($classPath, $genrb, $pkgData, $schemaPath);
 }
 

@@ -18,14 +18,17 @@ PWD := $(shell pwd)
 NPROC ?= $(shell nproc --all)
 BUILD_TYPE ?= Debug
 
-DOCKER_NAMESPACE ?= openstreams
+DOCKER_BUILD = $(shell echo "$(BUILD_TYPE)" | tr '[:upper:]' '[:lower:]')
 DOCKER_REGISTRY ?= docker.io
+DOCKER_NAMESPACE ?= openstreams
 
-IMAGE_BUILD = $(shell echo "$(BUILD_TYPE)" | tr '[:upper:]' '[:lower:]')
+.PHONY: all default x86 info platform runtime test format lint image clean
 
-.PHONY: all info platform runtime test format lint image clean
+default: prepare info platform runtime
 
-all: prepare info platform runtime
+x86: clean default image-build image-push manifest-build-x86 manifest-push
+
+all: clean default image-build image-push manifest-build manifest-push
 
 builder:
 	@make -C docker builder
@@ -139,6 +142,7 @@ interactive: prepare
 
 runtime-image-build:
 	@make -C docker \
+		DOCKER_BUILD=$(DOCKER_BUILD) \
 		DOCKER_NAMESPACE=$(DOCKER_NAMESPACE) \
 		DOCKER_REGISTRY=$(DOCKER_REGISTRY) \
 		runtime-img-build
@@ -151,6 +155,7 @@ image-build: runtime-image-build
 
 runtime-image-push:
 	@make -C docker \
+		DOCKER_BUILD=$(DOCKER_BUILD) \
 		DOCKER_NAMESPACE=$(DOCKER_NAMESPACE) \
 		DOCKER_REGISTRY=$(DOCKER_REGISTRY) \
 		runtime-img-push
@@ -163,8 +168,8 @@ image-push: runtime-image-push
 
 runtime-manifest-build-x86:
 	@docker manifest create --amend --insecure \
-		$(DOCKER_REGISTRY)/$(DOCKER_NAMESPACE)/streams-runtime:6.${IMAGE_BUILD} \
-		$(DOCKER_REGISTRY)/$(DOCKER_NAMESPACE)/streams-runtime:6.x86_64.${IMAGE_BUILD}
+		$(DOCKER_REGISTRY)/$(DOCKER_NAMESPACE)/streams-runtime:6.${DOCKER_BUILD} \
+		$(DOCKER_REGISTRY)/$(DOCKER_NAMESPACE)/streams-runtime:6.x86_64.${DOCKER_BUILD}
 
 manifest-build-x86: runtime-manifest-build-x86
 
@@ -174,9 +179,9 @@ manifest-build-x86: runtime-manifest-build-x86
 
 runtime-manifest-build:
 	@docker manifest create --amend --insecure \
-		$(DOCKER_REGISTRY)/$(DOCKER_NAMESPACE)/streams-runtime:6.${IMAGE_BUILD} \
-		$(DOCKER_REGISTRY)/$(DOCKER_NAMESPACE)/streams-runtime:6.ppc64le.${IMAGE_BUILD} \
-		$(DOCKER_REGISTRY)/$(DOCKER_NAMESPACE)/streams-runtime:6.x86_64.${IMAGE_BUILD}
+		$(DOCKER_REGISTRY)/$(DOCKER_NAMESPACE)/streams-runtime:6.${DOCKER_BUILD} \
+		$(DOCKER_REGISTRY)/$(DOCKER_NAMESPACE)/streams-runtime:6.ppc64le.${DOCKER_BUILD} \
+		$(DOCKER_REGISTRY)/$(DOCKER_NAMESPACE)/streams-runtime:6.x86_64.${DOCKER_BUILD}
 
 manifest-build: runtime-manifest-build
 
@@ -186,6 +191,6 @@ manifest-build: runtime-manifest-build
 
 runtime-manifest-push:
 	@docker manifest push --purge --insecure \
-		$(DOCKER_REGISTRY)/$(DOCKER_NAMESPACE)/streams-runtime:6.${IMAGE_BUILD}
+		$(DOCKER_REGISTRY)/$(DOCKER_NAMESPACE)/streams-runtime:6.${DOCKER_BUILD}
 
 manifest-push: runtime-manifest-push

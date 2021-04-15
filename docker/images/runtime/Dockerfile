@@ -16,9 +16,9 @@
 
 # Build arguments
 #
+ARG DOCKER_ARCH
 ARG DOCKER_REGISTRY
 ARG DOCKER_NAMESPACE
-ARG DOCKER_ARCH
 
 # Bring in all the dependencies
 #
@@ -27,7 +27,7 @@ FROM ${DOCKER_REGISTRY}/${DOCKER_NAMESPACE}/streams-base:6.${DOCKER_ARCH} AS bas
 # Arguments
 #
 ARG DOCKER_ARCH
-ARG BUILD_TYPE
+ARG DOCKER_BUILD
 
 # Add the kubernetes repo
 #
@@ -58,7 +58,7 @@ ENV PATH="/usr/local/streams/bin:${PATH}"
 #
 RUN yum install -y epel-release \
  && yum install -y kubectl redis \
- && (([ "${BUILD_TYPE}x" = "debugx" ] && yum install -y gdb valgrind) || /bin/true) \
+ && (([ "${DOCKER_BUILD}x" = "debugx" ] && yum install -y gdb valgrind) || /bin/true) \
  && yum clean -y all \
  && rm -rf /var/cache/yum
 

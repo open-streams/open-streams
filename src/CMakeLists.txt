@@ -194,3 +194,9 @@ add_subdirectory(schema)
 BuildProductFile(PRODUCT_FILE)
 add_custom_target(build_prodfile ALL DEPENDS ${PRODUCT_FILE})
 install(FILES ${PRODUCT_FILE} DESTINATION .)
+
+#
+# Install etc/
+#
+
+install(DIRECTORY etc/ TYPE SYSCONF)

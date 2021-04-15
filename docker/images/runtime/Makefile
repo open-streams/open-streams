@@ -15,8 +15,7 @@
 #
 
 NAME := streams-runtime
-BUILD := $(shell echo "$(BUILD_TYPE)" | tr '[:upper:]' '[:lower:]')
-VERSION := 6.$(DOCKER_ARCH).$(BUILD)
+VERSION := 6.$(DOCKER_ARCH).$(DOCKER_BUILD)
 
 REPO_ROOT := $(shell realpath $(shell pwd)/../../..)
 WORKDIR := $(REPO_ROOT)/build/images/runtime
