@@ -4,45 +4,33 @@ Open-source, Cloud-native version of [IBM Streams](https://www.ibm.com/support/k
 on top of Kubernetes, leveraging the [operator pattern](https://kubernetes.io/docs/concepts/extend-kubernetes/operator/) to manage its internal
 resources like _Jobs_ or _Processing Elements_.
 
-## Building Streams
+## Documentation
 
-This tutorial assumes that you have a docker registry running on
-`localhost:5000` and that your docker namespace is `$USER`. To change either,
-use the `DOCKER_REGISTRY` or `DOCKER_NAMESPACE` variables when calling `make`.
+### General
 
-### (Optional) Install a local registry
+* [Getting started](doc/general/getting_started.md)
+* [Building Streams](doc/general/building_streams.md)
+* [Compatibility](doc/general/compatibility.md)
 
-See [the official documentation](https://docs.docker.com/registry/deploying/).
+### Design
 
-### Building and pushing the builder image
-```bash
-$ make builder
-```
-### Building Streams platform and runtime
-```bash
-$ make
-```
-### (Optional) Running unit tests
-```bash
-$ make platform-test
-$ make runtime-test
-```
-### Building and pushing the runtime image
-```bash
-$ make runtime-image-build
-$ make runtime-image-push
-```
-### Building and pushing the runtime manifest
-```bash
-$ make runtime-manifest-build-x86
-$ make runtime-manifest-push
-```
-## Running Streams
+* [Instance operator](doc/design/instance_operator.md)
+* [Processing elements](doc/design/processing_elements.md)
+* [Kubernetes adapter](doc/design/kubernetes_adapter.md)
+* [Consistent regions](doc/design/consistent_regions.md)
+* [Failure handling](doc/design/failure_handling.md)
+* [Host constraints](doc/design/host_constraints.md)
+* [Import/Export](doc/design/import_export.md)
 
-The wiki contains a page about running Streams applications on Kubernetes.
-The folder `src/java/platform/com.ibm.streams.controller/examples` contains some
-job examples to get you started.
+### Deep dives
 
-## License.
+* [Installation](doc/deep_dives/installation.md)
+* [Instance operator](doc/deep_dives/instance_operator.md)
+* [Job submission](doc/deep_dives/job_submission.md)
+* [State machines](doc/deep_dives/state_machines.md)
+* [Consistent regions](doc/deep_dives/consistent_regions.md)
+* [Import/Export](doc/deep_dives/import_export.md)
+
+## License
 
 Apache 2.0. Please see the `LICENSE` file.
