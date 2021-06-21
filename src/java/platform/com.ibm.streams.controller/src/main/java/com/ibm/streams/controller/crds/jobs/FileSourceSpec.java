@@ -17,27 +17,18 @@
 package com.ibm.streams.controller.crds.jobs;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.ibm.streams.controller.bundle.EBundlePullPolicy;
 import io.fabric8.kubernetes.api.model.KubernetesResource;
 import lombok.Getter;
 import lombok.Setter;
 
 @JsonDeserialize
-public class BundleSpec implements KubernetesResource {
+public class FileSourceSpec implements KubernetesResource {
 
-  @Getter @Setter private String name;
-  @Getter @Setter private EBundlePullPolicy pullPolicy;
-  @Getter @Setter private GithubSourceSpec github;
-  @Getter @Setter private FileSourceSpec file;
+  @Getter @Setter private String path;
 
-  public BundleSpec() {
-    this.pullPolicy = EBundlePullPolicy.IfNotPresent;
-  }
+  public FileSourceSpec() {}
 
-  public BundleSpec(BundleSpec spec) {
-    this.name = spec.name;
-    this.pullPolicy = spec.pullPolicy;
-    this.github = spec.github != null ? new GithubSourceSpec(spec.github) : null;
-    this.file = spec.file != null ? new FileSourceSpec(spec.file) : null;
+  public FileSourceSpec(FileSourceSpec spec) {
+    this.path = spec.path;
   }
 }

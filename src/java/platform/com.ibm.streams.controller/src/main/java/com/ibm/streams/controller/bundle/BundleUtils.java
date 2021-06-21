@@ -17,12 +17,14 @@
 package com.ibm.streams.controller.bundle;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.util.Optional;
 import lombok.var;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okio.Okio;
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
@@ -136,6 +138,38 @@ public class BundleUtils {
     /*
      * Return the result.
      */
+    return result;
+  }
+
+  public static Optional<byte[]> loadBundleFromFile(
+      String name, String path, EBundlePullPolicy pullPolicy, String ns) {
+    /*
+     * Evaluate the pull policy.
+     */
+    if (pullPolicy == EBundlePullPolicy.IfNotPresent && isBundleInRedis(name, ns)) {
+      LOGGER.info("Bundle {} already present in the repository", name);
+      return loadBundleFromRedis(name, ns);
+    }
+    /*
+     * Read the file
+     */
+    Optional<byte[]> result = Optional.empty();
+    var file = new File(path);
+    if (file.exists()) {
+      try {
+        result = Optional.of(FileUtils.readFileToByteArray(file));
+      } catch (IOException ignored) {
+        LOGGER.error("Failed to read SAB at path {}", path);
+      }
+    }
+    /*
+     * Return the result.
+     */
+    result.ifPresent(
+        v -> {
+          LOGGER.info("Bundle {} successfully loaded from {}", name, path);
+          storeBundleToRedis(name, v, ns);
+        });
     return result;
   }
 

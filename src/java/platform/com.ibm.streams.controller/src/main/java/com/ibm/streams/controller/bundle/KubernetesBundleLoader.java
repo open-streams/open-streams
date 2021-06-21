@@ -33,35 +33,51 @@ public class KubernetesBundleLoader implements IBundleLoader {
     this.client = client;
   }
 
-  @Override
-  public Optional<Bundle> load(BundleSpec spec, String namespace) {
+  private Optional<byte[]> loadFileSource(BundleSpec spec, String namespace) {
+    return BundleUtils.loadBundleFromFile(
+        spec.getName(), spec.getFile().getPath(), spec.getPullPolicy(), namespace);
+  }
+
+  private Optional<byte[]> loadGithubSource(BundleSpec spec, String namespace) {
     Optional<byte[]> content = Optional.empty();
-    /*
-     * Get the content direcly from Redis or from Github.
-     */
-    if (spec.getUrl() == null) {
-      content = BundleUtils.loadBundleFromRedis(spec.getName(), namespace);
-    } else if (spec.getSecret() == null) {
+    if (spec.getGithub().getSecret() == null) {
       content =
           BundleUtils.loadBundleFromGithub(
-              spec.getName(), spec.getUrl(), spec.getPullPolicy(), namespace);
+              spec.getName(), spec.getGithub().getUrl(), spec.getPullPolicy(), namespace);
     } else {
-      var secret = client.secrets().inNamespace(namespace).withName(spec.getSecret()).get();
+      var secret =
+          client.secrets().inNamespace(namespace).withName(spec.getGithub().getSecret()).get();
       if (secret == null) {
-        LOGGER.error("Cannot find secret {}", spec.getSecret());
+        LOGGER.error("Cannot find secret {}", spec.getGithub().getSecret());
       } else if (secret.getData() != null && secret.getData().containsKey("token")) {
         var token64 = secret.getData().get("token");
         var token = new String(Base64.getDecoder().decode(token64));
         content =
             BundleUtils.loadBundleFromGithub(
-                spec.getName(), spec.getUrl(), token, spec.getPullPolicy(), namespace);
-      } else {
-        LOGGER.error("Secret {} does not contain a token", spec.getSecret());
+                spec.getName(), spec.getGithub().getUrl(), token, spec.getPullPolicy(), namespace);
       }
     }
+    return content;
+  }
+
+  @Override
+  public Optional<Bundle> load(BundleSpec spec, String namespace) {
+    Optional<byte[]> result = Optional.empty();
     /*
-     * Return the bundle.
+     * Get the content direcly from Redis or from Github.
      */
-    return content.map(c -> new Bundle(spec.getName(), c));
+    if (spec.getFile() != null && spec.getGithub() != null) {
+      LOGGER.error("Options bundle.file and bundle.github are mutually exclusive");
+    } else if (spec.getFile() == null && spec.getGithub() == null) {
+      result = BundleUtils.loadBundleFromRedis(spec.getName(), namespace);
+    } else if (spec.getFile() != null) {
+      result = loadFileSource(spec, namespace);
+    } else if (spec.getGithub() != null) {
+      result = loadGithubSource(spec, namespace);
+    }
+    /*
+     * Invalid bundle.
+     */
+    return result.map(c -> new Bundle(spec.getName(), c));
   }
 }

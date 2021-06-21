@@ -8,8 +8,8 @@
 
 The frontend of the controller responds to Kubernetes `add`, `modify`, `delete`
 operations. There is very good support for this in Go's kubernetes client
-interface, but other languages can also be used. If the controller is
-restarted, the event cache synchronizes itself with Kubernetes and throws
+interface, but other languages can also be used. If the controller is restarted,
+the event cache synchronizes itself with Kubernetes and throws
 _synchronization_ `ADDITION` events.
 
 #### Implementation
@@ -19,9 +19,10 @@ the `fabric8` Kubernetes client. It also uses the `microbean-controller-cache`
 library to provide the implementation details of the Kubernetes controller
 interface.
 
-It is strongly recommended to read [Understanding controllers](https://lairdnelson.wordpress.com/2018/01/07/understanding-kubernetes-tools-cache-package-part-0/). It is fairly
-technical but clearly explains the various pieces involved in building and
-running a controller.
+It is strongly recommended to
+read [Understanding controllers](https://lairdnelson.wordpress.com/2018/01/07/understanding-kubernetes-tools-cache-package-part-0/)
+. It is fairly technical but clearly explains the various pieces involved in
+building and running a controller.
 
 ### Backend
 
@@ -35,7 +36,8 @@ through the Job description.
 The backend role is double:
 
 1. Generate a set of AADL from an initial ADL within Job submission request.
-2. Regenerate a set of AADL using an existing ADL from a PE modification request.
+2. Regenerate a set of AADL using an existing ADL from a PE modification
+   request.
 
 The first role is expected to only happen once at Job submission time and is not
 necessarily time sensitive (although it should happen in a short enough time).
@@ -47,17 +49,19 @@ request of an external load balancer) and is therefore time sensitive.
 A `Job` custom resource represents a Streams job. For each job `job`, multiple
 processing elements `job-0`, `job-1`, ... are created. A job can be created as
 follows:
+
 ```yaml
 apiVersion: streams.ibm.com/v1
 kind: Job
 metadata:
-    name: apps-parallel
+  name: apps-parallel
 spec:
-    bundle:
-        name: apps.parallel.Parallel.sab
-    fusion:
-        manual: 3
+  bundle:
+    name: apps.parallel.Parallel.sab
+  fusion:
+    manual: 3
 ```
+
 A job `spec` accepts the following configuration:
 
 | Name | Type | Description | Default |
@@ -76,37 +80,56 @@ A job `spec` accepts the following configuration:
 The `resource` option can be used to define a job-wide resource request. It is
 empty by default. The table below summarizes how this request is handled:
 
-| Job has `resource` | PE has `resource` | Behavior |
-|:--:|:--:|:-|
-| 𐄂 | 𐄂 | PEs use their defaults **regardless of their count** |
-| 𐄂 | ✓ | PEs use the specified PE requests **regardless of their count** |
-| ✓ | 𐄂 | PEs use the specified Job requests **divided by their count** |
-| ✓ | ✓ | PEs use the specified Job requests **divided by their count** |
+| Job has `resource` | PE has `resource` | Behavior | |:--:|:--:|:-| | 𐄂 | 𐄂 |
+PEs use their defaults **regardless of their count** | | 𐄂 | ✓ | PEs use the
+specified PE requests **regardless of their count** | | ✓ | 𐄂 | PEs use the
+specified Job requests **divided by their count** | | ✓ | ✓ | PEs use the
+specified Job requests **divided by their count** |
 
 #### Bundle
 
-Application bundles are fetched remotely from an URL and cached locally. A bundle `spec`
+Application bundles are fetched remotely from an URL and cached locally. A
+bundle `spec`
 of a job defines the properties of bundle to be used. The options are:
 
 | Name | Type | Description |
 |:-----|:-----|:------------|
 | `name` | `string` | The bundle name |
 | `pullPolicy` | `enum` | Either `IfNotPresent` or `Always`, default is `IfNotPresent` |
-| `secret` | `integer` | A secret containing the GitHub personal token required to access `url` |
-| `url` | `string` | An external URL pointing to the bundle to be fetched |
+| `file` | `dictionary` |  A `FileSource` object |
+| `github` | `dictionary` |  A `GithubSource` object |
 
-The `name` and `url` options are mandatory. If `secret` is specified, the `url` field is expected to be
+The `name` option is mandatory. The `file` and `github` options are mutually
+exclusive.
+
+##### FileSource
+
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| `path` | `string` | A local path pointing to the bundle to be fetched |
+
+##### GithubSource
+
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| `url` | `string` | An external URL pointing to the bundle to be fetched |
+| `secret` | `integer` | A secret containing the GitHub personal token required to access `url` |
+
+The `url` option is mandatory. If `secret` is specified, the `url` field must be
 that of a GitHub repository compliant with the GitHub API v3 format:
+
 ```
 https://api.${GITHUB_URL}/repos/${USER}/${REPOSITORY}/contents/${PATH_TO_BUNDLE}.sab
 ```
-The `pullPolicy` option, if specified, determines whether or not the bundle is actually fetched.
-The `pullPolicy` and `secret` options are only meaningful if the `url` option is specified.
+
+The `pullPolicy` option, if specified, determines whether or not the bundle is
+actually fetched. The `pullPolicy` and `secret` options are only meaningful if
+the `url` option is specified.
 
 #### Fusion
 
-A fusion `spec` of a job controls how the controller fuses operators into 
-PEs. The options are:
+A fusion `spec` of a job controls how the controller fuses operators into PEs.
+The options are:
 
 | Name | Type | Description |
 |:-----|:-----|:------------|
@@ -138,7 +161,7 @@ A threading model `spec` accepts the following configuration:
 | `dynamic` | `dictionary` | [Dynamic threading model](#dynamic-threading-model) |
 | `manual` | `boolean` | Use manual fusion |
 
-These options are mutually exclusive. It is a logical error to request more than 
+These options are mutually exclusive. It is a logical error to request more than
 one threading model.
 
 #### Dynamic threading model
@@ -199,8 +222,8 @@ messages coming from the runtime (with the `SPCDBG` macro).
 
 The `appTraceLevel` option sets the level for the application domain. Unset by
 default, the level defined in the AADL is used. When set, the specified value
-override that of the AADL.  The `runtimeTraceLevel` option sets the level for
-the runtime domain.
+override that of the AADL. The `runtimeTraceLevel` option sets the level for the
+runtime domain.
 
 ##### Restart policies
 
@@ -219,8 +242,8 @@ For instance, the lack of `streamtool` interface makes the behavior of `stoppe`
 and `restartpe` irrelevant. However, users can voluntarily delete a pod if they
 so wish.
 
-The table below summarizes the various scenarios where a pod can be restarted
-in Knative Streams:
+The table below summarizes the various scenarios where a pod can be restarted in
+Knative Streams:
 
 | Name | Type | Description | Default |
 |:-----|:-----|:------------|:--------------|
@@ -229,8 +252,8 @@ in Knative Streams:
 | `restartDeletedPod` | `boolean` | Restart manually deleted pods | `false` |
 | `restartFailedPod` | `Boolean` | Restart failed pods | `null `|
 
-The `restartCompletedPod` option covers the internal, explicit and
-implicit shutdown situations. When `false`, pods that terminate with a
+The `restartCompletedPod` option covers the internal, explicit and implicit
+shutdown situations. When `false`, pods that terminate with a
 `Completed` status (i.e. with an exit status code of 0) are not restarted. When
 `true`, these pods are restarted.
 
@@ -240,15 +263,16 @@ restarted. As it is not trivial to determine whether or not a pod has been
 voluntarily deleted, this option acts as a fall-through for terminating pods
 with both `restartCompletedPod` and `restartFailedPod` set to `false`.
 
-The `restartFailedPod` covers the error scenarios where a pod fails because of an
-internal exception. When `null`, the instance controller uses the `restartable`
+The `restartFailedPod` covers the error scenarios where a pod fails because of
+an internal exception. When `null`, the instance controller uses
+the `restartable`
 configuration value derived from the owning processing element's configuration.
-When `false`, pods that terminate with a `Failed` status (i.e. with an exit
-code ≠ 0) are not restarted. When `true`, these pods are restarted.
+When `false`, pods that terminate with a `Failed` status (i.e. with an exit code
+≠ 0) are not restarted. When `true`, these pods are restarted.
 
 The `deleteFailedPod` is used to automatically delete failed pods. Although it
 is `true` by default, this option is useful to diagnose situations where pods
-would continuously fail, by inspecting their logs for instance. 
+would continuously fail, by inspecting their logs for instance.
 
 ##### Liveness probe
 
@@ -315,16 +339,18 @@ A checkpoint data store `spec` accepts the following configuration:
 
 ### Dependencies
 
-Kubernetes keeps track of dependences between CRDs (eg. when a CRD is
-created as a result of a CRD creation). When a CRD is deleted, the deletion can
-be propagated 3-way:
+Kubernetes keeps track of dependences between CRDs (eg. when a CRD is created as
+a result of a CRD creation). When a CRD is deleted, the deletion can be
+propagated 3-way:
 
 * `Orphan`: the dependents are not deleted
 * `Background`: the owner and dependents are deleted asynchronously
-* `Foreground`: the owner is deleted _after_ all of its dependents have been deleted
+* `Foreground`: the owner is deleted _after_ all of its dependents have been
+  deleted
 
-The `kubectl` tool as well as the instance controller use the `Background` policy by
-default. When job submission or UDP fail, the instance controller uses the
+The `kubectl` tool as well as the instance controller use the `Background`
+policy by default. When job submission or UDP fail, the instance controller uses
+the
 `Foreground` deletion policy to restart the operation from a clean slate.
 
 ### Resource creation
@@ -332,7 +358,7 @@ default. When job submission or UDP fail, the instance controller uses the
 #### Pods
 
 The creation of a pod is controlled by the pod state machine. The pod state
-machine checks the fulfillment of the following criterias before creating pods: 
+machine checks the fulfillment of the following criterias before creating pods:
 
 * Creation of the configmap that stores the AADL for the pod
 * Modification event for the processing element either due to the increment of
@@ -355,8 +381,8 @@ Kubernetes.
 
 A processing element can be deleted either voluntarily by the user, as a result
 of a UDP resizing, or garbage collected by Kubernetes. The current policy when a
-processing element is voluntarily deleted and a job still exists is to
-recreate it automatically as long as its `restartable` flag permits it.
+processing element is voluntarily deleted and a job still exists is to recreate
+it automatically as long as its `restartable` flag permits it.
 
 #### Pods
 
@@ -401,7 +427,7 @@ Processing elements can only be defined for existing jobs. If an invalid job is
 specified then an error must be reported. It is unclear where that check should
 be happening and how the error should be reported. An obvious solution is
 throught the `/status` sub-resource, but `Event` resources can also be used.
- 
+
 ## Open questions
 
 ### Replication
@@ -410,7 +436,7 @@ Scale in Kubernetes is handled through replication. The concept of replication
 implies that replicated pods have identical functions or roles (i.e. multiple
 instances of the same application). Replication for CRDs is handled by the
 `/scale` sub-resource. This sub-resource is used as an interface with standard
-replication controllers. 
+replication controllers.
 
 It is conceivable to use the concept of replica as a mean to control the arity
 of heterogeneous resources. For instance, the replica count can be used to
@@ -419,7 +445,7 @@ control the number of running PEs even though PEs are not idempotent.
 The advantage of this approach is to expose some sort of Streams elasticity to
 the user using a familiar concept. Its downside is that it hijacks the concept
 of replica and breaks compatibility with generic replica controllers. It could
-also confuse users by falsely claiming idempotence for the processing elements. 
+also confuse users by falsely claiming idempotence for the processing elements.
 
 The ideal solution is to have generic processing elements that can execute
 arbitrary sets of operators and can switch between these sets over the course of
@@ -428,16 +454,16 @@ specialized in the execution of operators.
 
 The current PE runtime is not flexible enough to fit in that solution. A PE is
 given a set of operators and is defined by that set. It does not support
-swapping this set for another set while running and no two PEs are identical. 
+swapping this set for another set while running and no two PEs are identical.
 
 The only exception to that statement are parallel regions configured with
 channel isolation. In that setup, multiple identical channels are executed by
 different PEs with identical sets of operators. Changing the arity of the
 parallel region is done by adding or removing identical PEs.
 
-It is then conceivable that Streams replicas compatible with Kubernetes'
-concept of replica can be implemented by exposing to the user the parallel count
-of a parallel region through the `replicaCount` property of the `/scale`
+It is then conceivable that Streams replicas compatible with Kubernetes' concept
+of replica can be implemented by exposing to the user the parallel count of a
+parallel region through the `replicaCount` property of the `/scale`
 sub-resource.
 
 To that end, the proper type capable of accurately modeling that replicated
@@ -446,8 +472,8 @@ fine-grained (and almost irrelevant in the current state of the runtime).
 
 ### Application sizing and resource control
 
-The number of PEs to fuse an application into is a parameter we must provide 
-to our fusion algorithms.
+The number of PEs to fuse an application into is a parameter we must provide to
+our fusion algorithms.
 
 In the automatic fusion feature introduced in Streams 4.2, if users do not
 specify the number of PEs, the default is to use the number of hosts in the
@@ -463,13 +489,13 @@ PEs to fuse a given application into. But we should be able to devise a
 heuristic based on both inherent characteristics of the application, and from
 Kubernetes itself:
 
-1. Minimum number of necessary threads. We can inspect an application and count the 
-   number of necessary threads, including source operators, threaded ports, and input 
-   ports that must execute under the dynamic threading model.
-2. Maximum number of threads. The total number of operators that may execute under the 
-   dynamic threading model, plus the minimum number of necessary threads, should yield 
-   the maximum number of threads an application can use.
-3. Pod CPU limits. We should be able to determine the CPU limits of the pod the 
+1. Minimum number of necessary threads. We can inspect an application and count
+   the number of necessary threads, including source operators, threaded ports,
+   and input ports that must execute under the dynamic threading model.
+2. Maximum number of threads. The total number of operators that may execute
+   under the dynamic threading model, plus the minimum number of necessary
+   threads, should yield the maximum number of threads an application can use.
+3. Pod CPU limits. We should be able to determine the CPU limits of the pod the
    PEs will execute in.
 
 The minimum CPU usage of any application is trivial to estimate: zero. That is
@@ -494,9 +520,9 @@ the entire cluster. Based on our current understanding, that information is not
 currently available. If it were, we could use that information, along with the
 above range of fusions, to make a final judgement of how many PEs to use.
 
-Without actual CPU usage, we will need to make some judgement of where in the 
-spectrum of possible number of PEs we should use. We can get a better idea of 
-what to do as we experiment with it. We should also investigate how we could get 
+Without actual CPU usage, we will need to make some judgement of where in the
+spectrum of possible number of PEs we should use. We can get a better idea of
+what to do as we experiment with it. We should also investigate how we could get
 actual CPU usage metrics from Kubernetes.
 
 ## Resources
