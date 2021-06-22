@@ -45,11 +45,6 @@ COPY --from=prometheus-cpp  /usr/local /usr/local
 COPY --from=rocksdb         /usr/local /usr/local
 COPY --from=tecla           /usr/local /usr/local
 
-# LC
-#
-RUN localedef -i en_US -f UTF-8 en_US
-ENV LC_ALL="en_US.UTF-8"
-
 # Required by OpenJDK
 #
 RUN yum install -y \

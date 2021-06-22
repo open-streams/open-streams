@@ -118,3 +118,8 @@ RUN yum install -y \
         xerces-c-devel \
  && yum clean -y all \
  && rm -rf /var/cache/yum
+
+# LC
+#
+RUN localedef -i en_US -f UTF-8 en_US
+ENV LC_ALL="en_US.UTF-8"

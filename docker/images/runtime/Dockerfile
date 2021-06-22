@@ -106,3 +106,8 @@ RUN echo "/usr/local/lib" >> /etc/ld.so.conf.d/local.conf \
  && echo "${STREAMS_INSTALL}/lib" >> /etc/ld.so.conf.d/streams.conf \
  && echo "${STREAMS_INSTALL}/system/impl/lib" >> /etc/ld.so.conf.d/streams.conf \
  && ldconfig
+
+# LC
+#
+RUN localedef -i en_US -f UTF-8 en_US
+ENV LC_ALL="en_US.UTF-8"
