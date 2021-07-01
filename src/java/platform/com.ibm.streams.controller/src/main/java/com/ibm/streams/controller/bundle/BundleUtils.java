@@ -156,11 +156,17 @@ public class BundleUtils {
     Optional<byte[]> result = Optional.empty();
     var file = new File(path);
     if (file.exists()) {
-      try {
-        result = Optional.of(FileUtils.readFileToByteArray(file));
-      } catch (IOException ignored) {
-        LOGGER.error("Failed to read SAB at path {}", path);
+      if (file.isFile()) {
+        try {
+          result = Optional.of(FileUtils.readFileToByteArray(file));
+        } catch (IOException ignored) {
+          LOGGER.error("Failed to read SAB at path {}", path);
+        }
+      } else {
+        LOGGER.error("Path is not a file: {}", path);
       }
+    } else {
+      LOGGER.error("Invalid path: {}", path);
     }
     /*
      * Return the result.
