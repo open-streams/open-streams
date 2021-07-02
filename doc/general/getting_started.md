@@ -116,3 +116,74 @@ $ kubectl apply -f streams-metrics.yaml
 
 Then, using your web browser, navigate to `localhost:30800` for the `Prometheus`
 console, and `localhost:30900` for the `Grafana` console.
+
+### Using local storage
+
+For local development, it is useful to use local storage to provide the `data`
+volume as well as expose local application bundles to the operator. To that end,
+the following template creates the necessary `PersistentVolume` and
+`PersistentVolumeClaim`:
+
+```
+src/java/platform/com.ibm.streams.controller/templates/volumes/local-volume.yaml
+```
+
+The following steps explain how to set these resources up and bind them to the
+Streams operator and processing elements.
+
+#### Preparation
+
+1. Create a `/k8s` directory with world read, write, and execute permissions
+2. Create a `/k8s/data` and a `/k8s/sabs` directories with the same permissions
+3. Place your SABs in the `/k8s/sabs` directory
+4. Change the node name in `local-storage.yaml` with your own
+5. Apply the `local-storage.yaml` file
+
+#### Update the Streams operator deployment file
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+...
+spec:
+  ...
+  template:
+    ...
+    spec:
+      ...
+      containers:
+        - name: controller
+          ...
+          volumeMounts:
+            - mountPath: /sabs
+              name: local-volume
+              subPath: sabs
+        - name: repository
+          ...
+      volumes:
+        - name: local-volume
+          persistentVolumeClaim:
+            claimName: local-volume-claim
+```
+
+#### Update the job definition
+
+```yaml
+apiVersion: streams.ibm.com/v1
+kind: Job
+metadata:
+  name: parallel
+spec:
+  bundle:
+    name: apps.parallel.Parallel.sab
+    file:
+      path: /sabs/apps.parallel.Parallel.sab
+  processingElement:
+    dataVolumeClaim:
+      name: local-volume-claim
+      subPath: data
+  submissionTimeValues:
+    width1: 2
+    width2: 5
+    width3: 4
+```
