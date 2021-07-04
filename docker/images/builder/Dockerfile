@@ -25,7 +25,6 @@ ARG DOCKER_ARCH
 FROM ${DOCKER_REGISTRY}/${DOCKER_NAMESPACE}/ant:1.9.6.${DOCKER_ARCH}      AS ant
 FROM ${DOCKER_REGISTRY}/${DOCKER_NAMESPACE}/antlr3:3.1.3.${DOCKER_ARCH}   AS antlr3
 FROM ${DOCKER_REGISTRY}/${DOCKER_NAMESPACE}/clang-tools:9.${DOCKER_ARCH}  AS clang-tools
-FROM ${DOCKER_REGISTRY}/${DOCKER_NAMESPACE}/dita-ot:1.5.4.${DOCKER_ARCH}  AS dita-ot
 FROM ${DOCKER_REGISTRY}/${DOCKER_NAMESPACE}/maven:3.6.3.${DOCKER_ARCH}    AS maven
 FROM ${DOCKER_REGISTRY}/${DOCKER_NAMESPACE}/xsd:4.0.0.${DOCKER_ARCH}      AS xsd
 FROM ${DOCKER_REGISTRY}/${DOCKER_NAMESPACE}/streams-base:6.${DOCKER_ARCH} AS base
@@ -35,7 +34,6 @@ FROM ${DOCKER_REGISTRY}/${DOCKER_NAMESPACE}/streams-base:6.${DOCKER_ARCH} AS bas
 COPY --from=ant         /usr/local /usr/local
 COPY --from=antlr3      /usr/local /usr/local
 COPY --from=clang-tools /usr/local /usr/local
-COPY --from=dita-ot     /usr/local /usr/local
 COPY --from=maven       /usr/local /usr/local
 COPY --from=xsd         /usr       /usr      
 
