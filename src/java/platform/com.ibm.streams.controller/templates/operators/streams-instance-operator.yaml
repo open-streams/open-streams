@@ -66,7 +66,7 @@ spec:
             - name: STREAMS_DATA_PATH
               value: /tmp
             - name: STREAMS_BUILD_TYPE
-              value: debug
+              value: release
             - name: STREAMS_LOG_LEVEL
               value: INFO
             - name: MY_POD_NAMESPACE
