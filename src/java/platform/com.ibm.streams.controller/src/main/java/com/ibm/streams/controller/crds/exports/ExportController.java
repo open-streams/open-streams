@@ -56,8 +56,7 @@ public class ExportController extends GenericEventQueueConsumer<Export> {
     controller =
         new Controller<>(
             client
-                .customResources(
-                    factory.getContext(), Export.class, ExportList.class, DoneableExport.class)
+                .customResources(factory.getContext(), Export.class, ExportList.class)
                 .inNamespace(ns),
             this);
   }

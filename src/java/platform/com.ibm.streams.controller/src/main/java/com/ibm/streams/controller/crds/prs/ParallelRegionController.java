@@ -92,10 +92,7 @@ public class ParallelRegionController extends GenericEventQueueConsumer<Parallel
         new Controller<>(
             client
                 .customResources(
-                    prFactory.getContext(),
-                    ParallelRegion.class,
-                    ParallelRegionList.class,
-                    DoneableParallelRegion.class)
+                    prFactory.getContext(), ParallelRegion.class, ParallelRegionList.class)
                 .inNamespace(ns),
             this);
   }

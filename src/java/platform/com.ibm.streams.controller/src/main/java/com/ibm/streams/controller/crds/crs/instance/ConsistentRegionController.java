@@ -20,7 +20,6 @@ import com.ibm.streams.controller.crds.crs.ConsistentRegion;
 import com.ibm.streams.controller.crds.crs.ConsistentRegionFactory;
 import com.ibm.streams.controller.crds.crs.ConsistentRegionList;
 import com.ibm.streams.controller.crds.crs.ConsistentRegionStore;
-import com.ibm.streams.controller.crds.crs.DoneableConsistentRegion;
 import com.ibm.streams.controller.events.GenericEventQueueConsumer;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import java.io.IOException;
@@ -51,10 +50,7 @@ public class ConsistentRegionController extends GenericEventQueueConsumer<Consis
         new Controller<>(
             client
                 .customResources(
-                    crFactory.getContext(),
-                    ConsistentRegion.class,
-                    ConsistentRegionList.class,
-                    DoneableConsistentRegion.class)
+                    crFactory.getContext(), ConsistentRegion.class, ConsistentRegionList.class)
                 .inNamespace(ns),
             this);
   }

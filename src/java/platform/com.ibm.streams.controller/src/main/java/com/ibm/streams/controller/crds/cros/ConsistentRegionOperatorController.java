@@ -85,8 +85,7 @@ public class ConsistentRegionOperatorController
                 .customResources(
                     factory.getContext(),
                     ConsistentRegionOperator.class,
-                    ConsistentRegionOperatorList.class,
-                    DoneableConsistentRegionOperator.class)
+                    ConsistentRegionOperatorList.class)
                 .inNamespace(ns),
             this);
   }

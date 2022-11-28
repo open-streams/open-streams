@@ -16,29 +16,11 @@
 
 package com.ibm.streams.controller.crds.pes;
 
+import com.ibm.streams.controller.crds.ICustomResourceCommons;
 import io.fabric8.kubernetes.client.CustomResource;
+import io.fabric8.kubernetes.model.annotation.Group;
+import io.fabric8.kubernetes.model.annotation.Version;
 
-public class ProcessingElement extends CustomResource {
-
-  private ProcessingElementSpec spec;
-
-  @Override
-  public String toString() {
-    return "{ apiVersion='"
-        + getApiVersion()
-        + '\''
-        + ", metadata="
-        + getMetadata()
-        + ", spec="
-        + spec
-        + '}';
-  }
-
-  public ProcessingElementSpec getSpec() {
-    return spec;
-  }
-
-  public void setSpec(ProcessingElementSpec spec) {
-    this.spec = spec;
-  }
-}
+@Group(ICustomResourceCommons.STREAMS_CRD_GROUP)
+@Version(ICustomResourceCommons.STREAMS_CRD_VERSION)
+public class ProcessingElement extends CustomResource<ProcessingElementSpec, Void> {}

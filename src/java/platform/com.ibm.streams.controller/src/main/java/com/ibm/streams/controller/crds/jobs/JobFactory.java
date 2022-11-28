@@ -67,7 +67,7 @@ public class JobFactory {
      * Look for the Job CRD.
      */
     this.context =
-        client.customResourceDefinitions().list().getItems().stream()
+        client.apiextensions().v1().customResourceDefinitions().list().getItems().stream()
             .filter(e -> e.getMetadata().getName().equals(STREAMS_JOB_CRD_NAME))
             .findFirst()
             .map(CustomResourceDefinitionContext::fromCrd)
@@ -96,7 +96,7 @@ public class JobFactory {
      */
     var rsrc =
         client
-            .customResources(context, Job.class, JobList.class, DoneableJob.class)
+            .customResources(context, Job.class, JobList.class)
             .inNamespace(job.getMetadata().getNamespace())
             .withName(job.getMetadata().getName())
             .get();
@@ -123,7 +123,7 @@ public class JobFactory {
                */
               LOGGER.debug("UPD {}", job.getMetadata().getName());
               client
-                  .customResources(context, Job.class, JobList.class, DoneableJob.class)
+                  .customResources(context, Job.class, JobList.class)
                   .inNamespace(job.getMetadata().getNamespace())
                   .withName(job.getMetadata().getName())
                   .patch(target);
@@ -201,7 +201,7 @@ public class JobFactory {
                */
               LOGGER.debug("UPD {}", job.getMetadata().getName());
               client
-                  .customResources(context, Job.class, JobList.class, DoneableJob.class)
+                  .customResources(context, Job.class, JobList.class)
                   .inNamespace(job.getMetadata().getNamespace())
                   .withName(job.getMetadata().getName())
                   .replace(target);
@@ -228,7 +228,7 @@ public class JobFactory {
                */
               LOGGER.debug("RST {}", job.getMetadata().getName());
               client
-                  .customResources(context, Job.class, JobList.class, DoneableJob.class)
+                  .customResources(context, Job.class, JobList.class)
                   .inNamespace(job.getMetadata().getNamespace())
                   .withName(job.getMetadata().getName())
                   .create(target);

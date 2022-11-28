@@ -66,7 +66,7 @@ public class ImportFactory {
      * Look for the Import CRD.
      */
     this.context =
-        client.customResourceDefinitions().list().getItems().stream()
+        client.apiextensions().v1().customResourceDefinitions().list().getItems().stream()
             .filter(e -> e.getMetadata().getName().equals(STREAMS_IMPORT_CRD_NAME))
             .findFirst()
             .map(CustomResourceDefinitionContext::fromCrd)
@@ -103,16 +103,14 @@ public class ImportFactory {
 
   public void deleteImport(Import imp) {
     LOGGER.debug("DEL {}", imp.getMetadata().getName());
-    client
-        .customResources(this.context, Import.class, ImportList.class, DoneableImport.class)
-        .delete(imp);
+    client.customResources(this.context, Import.class, ImportList.class).delete(imp);
   }
 
   public void deleteImports(Job job) {
     /* FIXME(regression) https://github.com/fabric8io/kubernetes-client/issues/2745 */
     var list =
         client
-            .customResources(this.context, Import.class, ImportList.class, DoneableImport.class)
+            .customResources(this.context, Import.class, ImportList.class)
             .inNamespace(job.getMetadata().getNamespace())
             .withLabel(STREAMS_JOB_LABEL_KEY, job.getMetadata().getName())
             .list();
@@ -171,7 +169,7 @@ public class ImportFactory {
      */
     LOGGER.debug("ADD {}", imp.getMetadata().getName());
     client
-        .customResources(this.context, Import.class, ImportList.class, DoneableImport.class)
+        .customResources(this.context, Import.class, ImportList.class)
         .inNamespace(job.getMetadata().getNamespace())
         .create(imp);
   }
@@ -196,7 +194,7 @@ public class ImportFactory {
                */
               LOGGER.debug("UPD {}", imp.getMetadata().getName());
               client
-                  .customResources(context, Import.class, ImportList.class, DoneableImport.class)
+                  .customResources(context, Import.class, ImportList.class)
                   .inNamespace(imp.getMetadata().getNamespace())
                   .withName(imp.getMetadata().getName())
                   .patch(target);
@@ -219,7 +217,7 @@ public class ImportFactory {
                */
               LOGGER.debug("UPD {}", imp.getMetadata().getName());
               client
-                  .customResources(context, Import.class, ImportList.class, DoneableImport.class)
+                  .customResources(context, Import.class, ImportList.class)
                   .inNamespace(imp.getMetadata().getNamespace())
                   .withName(imp.getMetadata().getName())
                   .patch(target);
@@ -245,7 +243,7 @@ public class ImportFactory {
                */
               LOGGER.debug("UPD {}", imp.getMetadata().getName());
               client
-                  .customResources(context, Import.class, ImportList.class, DoneableImport.class)
+                  .customResources(context, Import.class, ImportList.class)
                   .inNamespace(job.getMetadata().getNamespace())
                   .withName(imp.getMetadata().getName())
                   .patch(target);

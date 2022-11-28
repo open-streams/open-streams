@@ -42,11 +42,7 @@ public class HostPoolController extends GenericEventQueueConsumer<HostPool> {
     controller =
         new Controller<>(
             client
-                .customResources(
-                    factory.getContext(),
-                    HostPool.class,
-                    HostPoolList.class,
-                    DoneableHostPool.class)
+                .customResources(factory.getContext(), HostPool.class, HostPoolList.class)
                 .inNamespace(ns),
             this);
   }

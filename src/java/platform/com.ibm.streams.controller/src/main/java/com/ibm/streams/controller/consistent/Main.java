@@ -22,7 +22,6 @@ import com.ibm.streams.controller.consistent.utils.ConsistentRegionOperatorMetri
 import com.ibm.streams.controller.crds.cros.ConsistentRegionOperator;
 import com.ibm.streams.controller.crds.cros.ConsistentRegionOperatorFactory;
 import com.ibm.streams.controller.crds.cros.ConsistentRegionOperatorList;
-import com.ibm.streams.controller.crds.cros.DoneableConsistentRegionOperator;
 import com.ibm.streams.controller.crds.crs.ConsistentRegionFactory;
 import com.ibm.streams.controller.crds.crs.ConsistentRegionStore;
 import com.ibm.streams.controller.crds.crs.consistent.ConsistentRegionController;
@@ -123,8 +122,7 @@ public class Main {
               .customResources(
                   croFactory.getContext(),
                   ConsistentRegionOperator.class,
-                  ConsistentRegionOperatorList.class,
-                  DoneableConsistentRegionOperator.class)
+                  ConsistentRegionOperatorList.class)
               .inNamespace(myNs)
               .withName(croName)
               .get();

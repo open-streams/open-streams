@@ -65,7 +65,7 @@ public class ParallelRegionFactory {
      * Look for the ParallelRegion CRD.
      */
     this.context =
-        client.customResourceDefinitions().list().getItems().stream()
+        client.apiextensions().v1().customResourceDefinitions().list().getItems().stream()
             .filter(e -> e.getMetadata().getName().equals(STREAMS_HOSTPOOL_CRD_NAME))
             .findFirst()
             .map(CustomResourceDefinitionContext::fromCrd)
@@ -137,29 +137,21 @@ public class ParallelRegionFactory {
      */
     LOGGER.debug("ADD {}", pr.getMetadata().getName());
     client
-        .customResources(
-            context, ParallelRegion.class, ParallelRegionList.class, DoneableParallelRegion.class)
+        .customResources(context, ParallelRegion.class, ParallelRegionList.class)
         .inNamespace(job.getMetadata().getNamespace())
         .createOrReplace(pr);
   }
 
   public void deleteParallelRegion(ParallelRegion pr) {
     LOGGER.debug("DEL {}", pr.getMetadata().getName());
-    client
-        .customResources(
-            context, ParallelRegion.class, ParallelRegionList.class, DoneableParallelRegion.class)
-        .delete(pr);
+    client.customResources(context, ParallelRegion.class, ParallelRegionList.class).delete(pr);
   }
 
   public void deleteParallelRegions(Job job) {
     /* FIXME(regression) https://github.com/fabric8io/kubernetes-client/issues/2745 */
     var list =
         client
-            .customResources(
-                context,
-                ParallelRegion.class,
-                ParallelRegionList.class,
-                DoneableParallelRegion.class)
+            .customResources(context, ParallelRegion.class, ParallelRegionList.class)
             .inNamespace(job.getMetadata().getNamespace())
             .withLabel(STREAMS_JOB_LABEL_KEY, job.getMetadata().getName())
             .list();
@@ -186,11 +178,7 @@ public class ParallelRegionFactory {
                */
               LOGGER.debug("UPD {}", pr.getMetadata().getName());
               client
-                  .customResources(
-                      context,
-                      ParallelRegion.class,
-                      ParallelRegionList.class,
-                      DoneableParallelRegion.class)
+                  .customResources(context, ParallelRegion.class, ParallelRegionList.class)
                   .inNamespace(pr.getMetadata().getNamespace())
                   .withName(pr.getMetadata().getName())
                   .patch(target);
@@ -216,11 +204,7 @@ public class ParallelRegionFactory {
                */
               LOGGER.debug("UPD {}", pr.getMetadata().getName());
               client
-                  .customResources(
-                      context,
-                      ParallelRegion.class,
-                      ParallelRegionList.class,
-                      DoneableParallelRegion.class)
+                  .customResources(context, ParallelRegion.class, ParallelRegionList.class)
                   .inNamespace(pr.getMetadata().getNamespace())
                   .withName(pr.getMetadata().getName())
                   .patch(target);

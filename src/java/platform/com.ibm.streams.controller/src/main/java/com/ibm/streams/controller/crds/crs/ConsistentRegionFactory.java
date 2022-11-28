@@ -61,7 +61,7 @@ public class ConsistentRegionFactory {
      * Look for the ConsistentRegion CRD.
      */
     this.context =
-        client.customResourceDefinitions().list().getItems().stream()
+        client.apiextensions().v1().customResourceDefinitions().list().getItems().stream()
             .filter(e -> e.getMetadata().getName().equals(STREAMS_CR_CRD_NAME))
             .findFirst()
             .map(CustomResourceDefinitionContext::fromCrd)
@@ -141,11 +141,7 @@ public class ConsistentRegionFactory {
      * Create the consistent region.
      */
     client
-        .customResources(
-            this.context,
-            ConsistentRegion.class,
-            ConsistentRegionList.class,
-            DoneableConsistentRegion.class)
+        .customResources(this.context, ConsistentRegion.class, ConsistentRegionList.class)
         .inNamespace(meta.getNamespace())
         .createOrReplace(cr);
   }
@@ -154,11 +150,7 @@ public class ConsistentRegionFactory {
     /* FIXME(regression) https://github.com/fabric8io/kubernetes-client/issues/2745 */
     var list =
         client
-            .customResources(
-                this.context,
-                ConsistentRegion.class,
-                ConsistentRegionList.class,
-                DoneableConsistentRegion.class)
+            .customResources(this.context, ConsistentRegion.class, ConsistentRegionList.class)
             .inNamespace(job.getMetadata().getNamespace())
             .withLabel(STREAMS_JOB_LABEL_KEY, job.getMetadata().getName())
             .list();
@@ -218,11 +210,7 @@ public class ConsistentRegionFactory {
                * Update the consistent region.
                */
               client
-                  .customResources(
-                      this.context,
-                      ConsistentRegion.class,
-                      ConsistentRegionList.class,
-                      DoneableConsistentRegion.class)
+                  .customResources(this.context, ConsistentRegion.class, ConsistentRegionList.class)
                   .inNamespace(cr.getMetadata().getNamespace())
                   .withName(cr.getMetadata().getName())
                   .patch(target);

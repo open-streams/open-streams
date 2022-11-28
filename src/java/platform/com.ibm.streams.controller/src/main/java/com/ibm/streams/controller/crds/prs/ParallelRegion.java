@@ -16,29 +16,11 @@
 
 package com.ibm.streams.controller.crds.prs;
 
+import com.ibm.streams.controller.crds.ICustomResourceCommons;
 import io.fabric8.kubernetes.client.CustomResource;
+import io.fabric8.kubernetes.model.annotation.Group;
+import io.fabric8.kubernetes.model.annotation.Version;
 
-public class ParallelRegion extends CustomResource {
-
-  private ParallelRegionSpec spec;
-
-  @Override
-  public String toString() {
-    return "{ apiVersion='"
-        + getApiVersion()
-        + '\''
-        + ", metadata="
-        + getMetadata()
-        + ", spec="
-        + spec
-        + '}';
-  }
-
-  public ParallelRegionSpec getSpec() {
-    return spec;
-  }
-
-  public void setSpec(ParallelRegionSpec spec) {
-    this.spec = spec;
-  }
-}
+@Group(ICustomResourceCommons.STREAMS_CRD_GROUP)
+@Version(ICustomResourceCommons.STREAMS_CRD_VERSION)
+public class ParallelRegion extends CustomResource<ParallelRegionSpec, Void> {}

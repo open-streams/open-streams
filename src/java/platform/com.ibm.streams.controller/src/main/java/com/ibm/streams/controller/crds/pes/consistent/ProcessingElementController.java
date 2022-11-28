@@ -23,7 +23,6 @@ import com.ibm.streams.controller.consistent.utils.ENotificationType;
 import com.ibm.streams.controller.consistent.utils.Notification;
 import com.ibm.streams.controller.crds.crs.consistent.ConsistentRegionController;
 import com.ibm.streams.controller.crds.pes.Connectivity;
-import com.ibm.streams.controller.crds.pes.DoneableProcessingElement;
 import com.ibm.streams.controller.crds.pes.ProcessingElement;
 import com.ibm.streams.controller.crds.pes.ProcessingElementFactory;
 import com.ibm.streams.controller.crds.pes.ProcessingElementList;
@@ -67,8 +66,7 @@ public class ProcessingElementController extends GenericEventQueueConsumer<Proce
                 .customResources(
                     ProcessingElementFactory.getContext(client),
                     ProcessingElement.class,
-                    ProcessingElementList.class,
-                    DoneableProcessingElement.class)
+                    ProcessingElementList.class)
                 .inNamespace(ns)
                 .withLabel(STREAMS_CR_LABEL_KEY, "true")
                 .withLabel(STREAMS_JOB_LABEL_KEY, jobName),

@@ -53,7 +53,7 @@ public class ConsistentRegionOperatorFactory {
      * Look for the ConsistentRegionOperator CRD.
      */
     this.context =
-        client.customResourceDefinitions().list().getItems().stream()
+        client.apiextensions().v1().customResourceDefinitions().list().getItems().stream()
             .filter(e -> e.getMetadata().getName().equals(STREAMS_CRO_CRD_NAME))
             .findFirst()
             .map(CustomResourceDefinitionContext::fromCrd)
@@ -122,10 +122,7 @@ public class ConsistentRegionOperatorFactory {
      */
     client
         .customResources(
-            this.getContext(),
-            ConsistentRegionOperator.class,
-            ConsistentRegionOperatorList.class,
-            DoneableConsistentRegionOperator.class)
+            this.getContext(), ConsistentRegionOperator.class, ConsistentRegionOperatorList.class)
         .inNamespace(job.getMetadata().getNamespace())
         .create(cro);
   }
@@ -148,8 +145,7 @@ public class ConsistentRegionOperatorFactory {
                   .customResources(
                       this.context,
                       ConsistentRegionOperator.class,
-                      ConsistentRegionOperatorList.class,
-                      DoneableConsistentRegionOperator.class)
+                      ConsistentRegionOperatorList.class)
                   .inNamespace(cro.getMetadata().getNamespace())
                   .withName(cro.getMetadata().getName())
                   .patch(target);

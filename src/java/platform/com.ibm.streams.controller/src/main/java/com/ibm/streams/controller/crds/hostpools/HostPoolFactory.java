@@ -66,7 +66,7 @@ public class HostPoolFactory {
      * Look for the HostPool CRD.
      */
     this.context =
-        client.customResourceDefinitions().list().getItems().stream()
+        client.apiextensions().v1().customResourceDefinitions().list().getItems().stream()
             .filter(e -> e.getMetadata().getName().equals(STREAMS_HOSTPOOL_CRD_NAME))
             .findFirst()
             .map(CustomResourceDefinitionContext::fromCrd)
@@ -137,7 +137,7 @@ public class HostPoolFactory {
      * Create the hostpool.
      */
     client
-        .customResources(context, HostPool.class, HostPoolList.class, DoneableHostPool.class)
+        .customResources(context, HostPool.class, HostPoolList.class)
         .inNamespace(job.getMetadata().getNamespace())
         .createOrReplace(hostpool);
   }
@@ -146,7 +146,7 @@ public class HostPoolFactory {
     /* FIXME(regression) https://github.com/fabric8io/kubernetes-client/issues/2745 */
     var list =
         client
-            .customResources(context, HostPool.class, HostPoolList.class, DoneableHostPool.class)
+            .customResources(context, HostPool.class, HostPoolList.class)
             .inNamespace(job.getMetadata().getNamespace())
             .withLabel(STREAMS_JOB_LABEL_KEY, job.getMetadata().getName())
             .list();

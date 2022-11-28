@@ -70,7 +70,7 @@ public class ProcessingElementFactory {
      * Look for the Pe CRD.
      */
     this.context =
-        client.customResourceDefinitions().list().getItems().stream()
+        client.apiextensions().v1().customResourceDefinitions().list().getItems().stream()
             .filter(e -> e.getMetadata().getName().equals(STREAMS_PE_CRD_NAME))
             .findFirst()
             .map(CustomResourceDefinitionContext::fromCrd)
@@ -88,7 +88,7 @@ public class ProcessingElementFactory {
     /*
      * Look for the Pe CRD.
      */
-    return client.customResourceDefinitions().list().getItems().stream()
+    return client.apiextensions().v1().customResourceDefinitions().list().getItems().stream()
         .filter(e -> e.getMetadata().getName().equals(STREAMS_PE_CRD_NAME))
         .findFirst()
         .map(CustomResourceDefinitionContext::fromCrd)
@@ -154,11 +154,7 @@ public class ProcessingElementFactory {
      */
     LOGGER.debug("ADD {}", pe.getMetadata().getName());
     client
-        .customResources(
-            this.context,
-            ProcessingElement.class,
-            ProcessingElementList.class,
-            DoneableProcessingElement.class)
+        .customResources(this.context, ProcessingElement.class, ProcessingElementList.class)
         .inNamespace(job.getMetadata().getNamespace())
         .createOrReplace(pe);
   }
@@ -174,11 +170,7 @@ public class ProcessingElementFactory {
      * NOTE(xrg) It is possible, albeit not required, to use the Foreground propagation policy here.
      */
     client
-        .customResources(
-            this.context,
-            ProcessingElement.class,
-            ProcessingElementList.class,
-            DoneableProcessingElement.class)
+        .customResources(this.context, ProcessingElement.class, ProcessingElementList.class)
         .inNamespace(pe.getMetadata().getNamespace())
         .withName(pe.getMetadata().getName())
         .withPropagationPolicy(DeletionPropagation.BACKGROUND)
@@ -189,11 +181,7 @@ public class ProcessingElementFactory {
     /* FIXME(regression) https://github.com/fabric8io/kubernetes-client/issues/2745 */
     var list =
         client
-            .customResources(
-                this.context,
-                ProcessingElement.class,
-                ProcessingElementList.class,
-                DoneableProcessingElement.class)
+            .customResources(this.context, ProcessingElement.class, ProcessingElementList.class)
             .inNamespace(job.getMetadata().getNamespace())
             .withLabel(STREAMS_JOB_LABEL_KEY, job.getMetadata().getName())
             .list();
@@ -221,10 +209,7 @@ public class ProcessingElementFactory {
               LOGGER.debug("UPD {}", pe.getMetadata().getName());
               client
                   .customResources(
-                      this.context,
-                      ProcessingElement.class,
-                      ProcessingElementList.class,
-                      DoneableProcessingElement.class)
+                      this.context, ProcessingElement.class, ProcessingElementList.class)
                   .inNamespace(pe.getMetadata().getNamespace())
                   .withName(pe.getMetadata().getName())
                   .patch(target);
@@ -248,10 +233,7 @@ public class ProcessingElementFactory {
               LOGGER.debug("UPD {}", pe.getMetadata().getName());
               client
                   .customResources(
-                      this.context,
-                      ProcessingElement.class,
-                      ProcessingElementList.class,
-                      DoneableProcessingElement.class)
+                      this.context, ProcessingElement.class, ProcessingElementList.class)
                   .inNamespace(pe.getMetadata().getNamespace())
                   .withName(pe.getMetadata().getName())
                   .patch(target);
@@ -278,10 +260,7 @@ public class ProcessingElementFactory {
               LOGGER.debug("UPD {}", pe.getMetadata().getName());
               client
                   .customResources(
-                      this.context,
-                      ProcessingElement.class,
-                      ProcessingElementList.class,
-                      DoneableProcessingElement.class)
+                      this.context, ProcessingElement.class, ProcessingElementList.class)
                   .inNamespace(job.getMetadata().getNamespace())
                   .withName(pe.getMetadata().getName())
                   .patch(target);
@@ -313,10 +292,7 @@ public class ProcessingElementFactory {
               LOGGER.debug("UPD {}", pe.getMetadata().getName());
               client
                   .customResources(
-                      this.context,
-                      ProcessingElement.class,
-                      ProcessingElementList.class,
-                      DoneableProcessingElement.class)
+                      this.context, ProcessingElement.class, ProcessingElementList.class)
                   .inNamespace(job.getMetadata().getNamespace())
                   .withName(pe.getMetadata().getName())
                   .patch(target);

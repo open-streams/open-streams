@@ -68,7 +68,7 @@ public class ExportFactory {
      * Look for the Export CRD.
      */
     this.context =
-        client.customResourceDefinitions().list().getItems().stream()
+        client.apiextensions().v1().customResourceDefinitions().list().getItems().stream()
             .filter(e -> e.getMetadata().getName().equals(STREAMS_EXPORT_CRD_NAME))
             .findFirst()
             .map(CustomResourceDefinitionContext::fromCrd)
@@ -111,16 +111,14 @@ public class ExportFactory {
 
   public void deleteExport(Export exp) {
     LOGGER.debug("UPD {}", exp.getMetadata().getName());
-    client
-        .customResources(context, Export.class, ExportList.class, DoneableExport.class)
-        .delete(exp);
+    client.customResources(context, Export.class, ExportList.class).delete(exp);
   }
 
   public void deleteExports(Job job) {
     /* FIXME(regression) https://github.com/fabric8io/kubernetes-client/issues/2745 */
     var list =
         client
-            .customResources(context, Export.class, ExportList.class, DoneableExport.class)
+            .customResources(context, Export.class, ExportList.class)
             .inNamespace(job.getMetadata().getNamespace())
             .withLabel(STREAMS_JOB_LABEL_KEY, job.getMetadata().getName())
             .list();
@@ -179,7 +177,7 @@ public class ExportFactory {
      */
     LOGGER.debug("ADD {}", exp.getMetadata().getName());
     client
-        .customResources(context, Export.class, ExportList.class, DoneableExport.class)
+        .customResources(context, Export.class, ExportList.class)
         .inNamespace(job.getMetadata().getNamespace())
         .create(exp);
   }
@@ -204,7 +202,7 @@ public class ExportFactory {
                */
               LOGGER.debug("UPD {}", exp.getMetadata().getName());
               client
-                  .customResources(context, Export.class, ExportList.class, DoneableExport.class)
+                  .customResources(context, Export.class, ExportList.class)
                   .inNamespace(exp.getMetadata().getNamespace())
                   .withName(exp.getMetadata().getName())
                   .patch(target);
@@ -230,7 +228,7 @@ public class ExportFactory {
                */
               LOGGER.debug("UPD {}", exp.getMetadata().getName());
               client
-                  .customResources(context, Export.class, ExportList.class, DoneableExport.class)
+                  .customResources(context, Export.class, ExportList.class)
                   .inNamespace(job.getMetadata().getNamespace())
                   .withName(exp.getMetadata().getName())
                   .patch(target);

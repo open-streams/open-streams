@@ -16,7 +16,11 @@
 
 package com.ibm.streams.controller.k8s.utils;
 
-import io.fabric8.kubernetes.api.model.*;
+import io.fabric8.kubernetes.api.model.EventSource;
+import io.fabric8.kubernetes.api.model.HasMetadata;
+import io.fabric8.kubernetes.api.model.ObjectMeta;
+import io.fabric8.kubernetes.api.model.ObjectReference;
+import io.fabric8.kubernetes.api.model.events.v1.Event;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import java.time.Instant;
 import java.util.concurrent.ConcurrentHashMap;
@@ -69,19 +73,19 @@ public class EventUtils {
      */
     var event = new Event();
     event.setApiVersion("v1");
-    event.setCount(1);
-    event.setFirstTimestamp(time);
-    event.setInvolvedObject(or);
+    event.setDeprecatedCount(1);
+    event.setDeprecatedFirstTimestamp(time);
+    event.setRegarding(or);
     event.setKind("Event");
-    event.setLastTimestamp(time);
-    event.setMessage(message);
+    event.setDeprecatedLastTimestamp(time);
+    event.setNote(message);
     event.setMetadata(meta);
     event.setReason(reason);
-    event.setSource(source);
+    event.setDeprecatedSource(source);
     event.setType(type);
     /*
      * Send the event.
      */
-    client.events().inNamespace(ns).createOrReplace(event);
+    client.events().v1().events().inNamespace(ns).createOrReplace(event);
   }
 }
