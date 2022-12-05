@@ -28,7 +28,6 @@ FROM ${DOCKER_REGISTRY}/${DOCKER_NAMESPACE}/boost:1.55.0.${DOCKER_ARCH}         
 FROM ${DOCKER_REGISTRY}/${DOCKER_NAMESPACE}/decnumber:1.0.0.${DOCKER_ARCH}        AS decnumber
 FROM ${DOCKER_REGISTRY}/${DOCKER_NAMESPACE}/dita-ot:1.5.4.${DOCKER_ARCH}          AS dita-ot
 FROM ${DOCKER_REGISTRY}/${DOCKER_NAMESPACE}/icu4c:56.2.${DOCKER_ARCH}             AS icu4c
-FROM ${DOCKER_REGISTRY}/${DOCKER_NAMESPACE}/openjdk:8.${DOCKER_ARCH}              AS openjdk
 FROM ${DOCKER_REGISTRY}/${DOCKER_NAMESPACE}/prometheus-cpp:0.11.0.${DOCKER_ARCH}  AS prometheus-cpp
 FROM ${DOCKER_REGISTRY}/${DOCKER_NAMESPACE}/rocksdb:5.18.3.${DOCKER_ARCH}         AS rocksdb
 FROM ${DOCKER_REGISTRY}/${DOCKER_NAMESPACE}/tecla:1.6.1.${DOCKER_ARCH}            AS tecla
@@ -42,14 +41,14 @@ COPY --from=boost           /usr/local /usr/local
 COPY --from=decnumber       /usr/local /usr/local
 COPY --from=dita-ot         /usr/local /usr/local
 COPY --from=icu4c           /usr/local /usr/local
-COPY --from=openjdk         /usr/local /usr/local
 COPY --from=prometheus-cpp  /usr/local /usr/local
 COPY --from=rocksdb         /usr/local /usr/local
 COPY --from=tecla           /usr/local /usr/local
 
-# Required by OpenJDK
+# OpenJDK
 #
 RUN yum install -y \
         fontconfig \
+        java-11-openjdk-headless \
  && yum clean -y all \
  && rm -rf /var/cache/yum

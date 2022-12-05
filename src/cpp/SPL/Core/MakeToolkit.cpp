@@ -555,24 +555,9 @@ static string getJavaClassPath(CompilerConfiguration& config)
 
 static bf::path getJavaLibPath(CompilerConfiguration& config)
 {
-    // Always use the internal java for indexing purposes.
+    /// OpenJDK uses a standard path regardless of the architecture
     bf::path result = config.getStringValue(CompilerConfiguration::JavaHome);
-    result /= "jre/lib";
-    bf::directory_iterator dir_end;
-    for (bf::directory_iterator iArch(result); iArch != dir_end; iArch++) {
-        bf::path arch = *iArch;
-        if (bf::is_directory(arch)) {
-            for (bf::directory_iterator iVmType(arch); iVmType != dir_end; iVmType++) {
-                bf::path vmType = *iVmType;
-                if (vmType.leaf() == "j9vm" || vmType.leaf() == "server") {
-                    result = vmType;
-                    goto archLoopDone;
-                }
-            }
-        }
-    }
-archLoopDone:
-    result /= "libjvm.so";
+    result /= "lib/server/libjvm.so";
     return result;
 }
 

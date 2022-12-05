@@ -39,23 +39,18 @@ COPY --from=xsd         /usr       /usr
 
 # Define JAVA_HOME
 #
-ARG DOCKER_ARCH
-ENV JAVA_HOME="/usr/local/java-${DOCKER_ARCH}-80"
+ENV JAVA_HOME="/usr/lib/jvm/java"
 
 # Update PATH
 #
 ARG DOCKER_ARCH
 ENV PATH="/usr/local/apache-ant-1.9.6/bin:${PATH}"
 ENV PATH="/usr/local/apache-maven-3.6.3/bin:${PATH}"
-ENV PATH="/usr/local/java-${DOCKER_ARCH}-80/bin:${PATH}"
 
 # Update ld.so.conf
 #
 RUN echo "/usr/local/lib" >> /etc/ld.so.conf.d/local.conf \
  && echo "/usr/local/lib64" >> /etc/ld.so.conf.d/local.conf \
- && echo "${JAVA_HOME}/jre/lib/amd64" >> /etc/ld.so.conf.d/openjdk.conf \
- && echo "${JAVA_HOME}/jre/lib/amd64/compressedrefs" >> /etc/ld.so.conf.d/openjdk.conf \
- && echo "${JAVA_HOME}/jre/lib/amd64/j9vm" >> /etc/ld.so.conf.d/openjdk.conf \
  && ldconfig
 
 # Install any needed packages
@@ -81,6 +76,7 @@ RUN yum install -y \
         cmake3 \
         gcc \
         gcc-c++ \
+        java-11-openjdk-devel \
         jq \
         make \
         ninja-build \
