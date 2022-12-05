@@ -16,9 +16,7 @@
 
 package com.ibm.streams.controller.crds.prs;
 
-import static com.ibm.streams.controller.crds.ICustomResourceCommons.STREAMS_GENERATION_LABEL_KEY;
-import static com.ibm.streams.controller.crds.ICustomResourceCommons.STREAMS_JOB_LABEL_KEY;
-import static com.ibm.streams.controller.crds.ICustomResourceCommons.STREAMS_PE_LABEL_KEY;
+import static com.ibm.streams.controller.crds.ICustomResourceCommons.*;
 import static com.ibm.streams.controller.crds.ICustomResourceEvents.PARALLEL_REGION_WIDTH_CHANGE_FAILURE;
 
 import com.ibm.streams.controller.crds.jobs.JobStore;
@@ -57,6 +55,8 @@ public class ParallelRegionController extends GenericEventQueueConsumer<Parallel
   private final ConfigMapStore cmStore;
   private final String ns;
   private final Controller<ParallelRegion> controller;
+
+  @SuppressWarnings("unused")
   private final CommonEnvironment env;
 
   public ParallelRegionController(
@@ -90,14 +90,7 @@ public class ParallelRegionController extends GenericEventQueueConsumer<Parallel
      */
     controller =
         new Controller<>(
-            client
-                .customResources(
-                    prFactory.getContext(),
-                    ParallelRegion.class,
-                    ParallelRegionList.class,
-                    DoneableParallelRegion.class)
-                .inNamespace(ns),
-            this);
+            client.resources(ParallelRegion.class, ParallelRegionList.class).inNamespace(ns), this);
   }
 
   @Override

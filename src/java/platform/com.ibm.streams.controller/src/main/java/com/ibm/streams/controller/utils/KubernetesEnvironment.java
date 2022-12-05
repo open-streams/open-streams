@@ -26,15 +26,9 @@ import java.util.Optional;
 public class KubernetesEnvironment extends CommonEnvironment {
 
   private final KubernetesClient client;
-  private final String name;
-  private final String namespace;
 
   public KubernetesEnvironment(KubernetesClient client) {
     this.client = client;
-    this.name =
-        Optional.ofNullable(System.getenv("MY_POD_NAME")).orElseThrow(RuntimeException::new);
-    this.namespace =
-        Optional.ofNullable(System.getenv("MY_POD_NAMESPACE")).orElseThrow(RuntimeException::new);
   }
 
   @Override

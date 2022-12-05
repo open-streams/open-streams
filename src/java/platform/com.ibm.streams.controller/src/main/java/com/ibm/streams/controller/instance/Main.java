@@ -86,15 +86,17 @@ public class Main {
     return executor;
   }
 
-  private static Instant getStartInstant(KubernetesClient client, String ns, String name)
-      throws InterruptedException {
+  private static Instant getStartInstant(KubernetesClient client, String ns, String name) {
     while (true) {
       /*
        * Make sure the pod exists.
        */
       var myPod = client.pods().inNamespace(ns).withName(name).get();
       if (myPod == null) {
-        Thread.sleep(100);
+        try {
+          Thread.sleep(100);
+        } catch (InterruptedException ignored) {
+        }
         continue;
       }
       /*
@@ -102,7 +104,10 @@ public class Main {
        */
       var statuses = myPod.getStatus().getContainerStatuses();
       if (statuses == null) {
-        Thread.sleep(100);
+        try {
+          Thread.sleep(100);
+        } catch (InterruptedException ignored) {
+        }
         continue;
       }
       /*
@@ -110,7 +115,10 @@ public class Main {
        */
       var status = statuses.stream().filter(cs -> cs.getName().equals("controller")).findFirst();
       if (!status.isPresent()) {
-        Thread.sleep(100);
+        try {
+          Thread.sleep(100);
+        } catch (InterruptedException ignored) {
+        }
         continue;
       }
       /*
@@ -118,7 +126,10 @@ public class Main {
        */
       var state = status.get().getState();
       if (state == null || state.getRunning() == null) {
-        Thread.sleep(100);
+        try {
+          Thread.sleep(100);
+        } catch (InterruptedException ignored) {
+        }
         continue;
       }
       /*
@@ -160,8 +171,7 @@ public class Main {
       /*
        * Grab the controller namespace and pod name environment variable.
        */
-      var myName =
-          Optional.ofNullable(System.getenv("MY_POD_NAME")).orElseThrow(RuntimeException::new);
+      var myName = Optional.ofNullable(System.getenv("MY_POD_NAME"));
       var myNs =
           Optional.ofNullable(System.getenv("MY_POD_NAMESPACE")).orElseThrow(RuntimeException::new);
       /*
@@ -185,7 +195,7 @@ public class Main {
        * timestamp. The pod creation timestamp is problematic because if the pod restarts due to
        * container failure the creation timestamp stays the same.
        */
-      var cTime = getStartInstant(client, myNs, myName);
+      var cTime = myName.map(v -> getStartInstant(client, myNs, v)).orElse(Instant.now());
       /*
        * Create the Streams instance.
        */

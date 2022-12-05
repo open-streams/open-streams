@@ -21,6 +21,7 @@ BUILD_TYPE ?= Debug
 DOCKER_BUILD = $(shell echo "$(BUILD_TYPE)" | tr '[:upper:]' '[:lower:]')
 DOCKER_REGISTRY ?= docker.io
 DOCKER_NAMESPACE ?= openstreams
+DOCKER_EXTRA_ARGS ?=
 
 .PHONY: all default x86 info platform runtime test format lint image clean
 
@@ -42,7 +43,7 @@ prepare:
 ifeq ($(DOCKER),)
 
 platform:
-	@docker run -it --rm \
+	@docker run $(DOCKER_EXTRA_ARGS) -it --rm \
 		-v $(PWD):$(PWD):rw \
 		-v $(HOME)/.m2:/home/builder/.m2:rw \
 		$(DOCKER_REGISTRY)/$(DOCKER_NAMESPACE)/streams-builder:6.$(shell uname -m) \
@@ -50,7 +51,7 @@ platform:
 	  make NPROC=$(NPROC) platform
 
 platform-test:
-	@docker run -it --rm \
+	@docker run $(DOCKER_EXTRA_ARGS) -it --rm \
 		-v $(PWD):$(PWD):rw \
 		-v $(HOME)/.m2:/home/builder/.m2:rw \
 		$(DOCKER_REGISTRY)/$(DOCKER_NAMESPACE)/streams-builder:6.$(shell uname -m) \
@@ -58,7 +59,7 @@ platform-test:
 		make NPROC=$(NPROC) platform-test
 
 runtime:
-	@docker run -it --rm \
+	@docker run $(DOCKER_EXTRA_ARGS) -it --rm \
 		-v $(PWD):$(PWD):rw \
 		-v $(HOME)/.m2:/home/builder/.m2:rw \
 		$(DOCKER_REGISTRY)/$(DOCKER_NAMESPACE)/streams-builder:6.$(shell uname -m) \
@@ -66,7 +67,7 @@ runtime:
 		make BUILD_TYPE=$(BUILD_TYPE) NPROC=$(NPROC) runtime
 
 runtime-doc:
-	@docker run -it --rm \
+	@docker run $(DOCKER_EXTRA_ARGS) -it --rm \
 		-v $(PWD):$(PWD):rw \
 		-v $(HOME)/.m2:/home/builder/.m2:rw \
 		$(DOCKER_REGISTRY)/$(DOCKER_NAMESPACE)/streams-builder:6.$(shell uname -m) \
@@ -74,7 +75,7 @@ runtime-doc:
 		make BUILD_TYPE=$(BUILD_TYPE) NPROC=$(NPROC) runtime-doc
 
 runtime-test:
-	@docker run -it --rm \
+	@docker run $(DOCKER_EXTRA_ARGS) -it --rm \
 		-v $(PWD):$(PWD):rw \
 		-v $(HOME)/.m2:/home/builder/.m2:rw \
 		$(DOCKER_REGISTRY)/$(DOCKER_NAMESPACE)/streams-builder:6.$(shell uname -m) \
@@ -82,7 +83,7 @@ runtime-test:
 		make BUILD_TYPE=$(BUILD_TYPE) NPROC=$(NPROC) runtime-test
 
 format:
-	@docker run -it --rm \
+	@docker run $(DOCKER_EXTRA_ARGS) -it --rm \
 		-v $(PWD):$(PWD):rw \
 		-v $(HOME)/.m2:/home/builder/.m2:rw \
 		$(DOCKER_REGISTRY)/$(DOCKER_NAMESPACE)/streams-builder:6.$(shell uname -m) \
@@ -90,7 +91,7 @@ format:
 		make BUILD_TYPE=$(BUILD_TYPE) NPROC=$(NPROC) format
 
 lint:
-	@docker run -it --rm \
+	@docker run $(DOCKER_EXTRA_ARGS) -it --rm \
 		-v $(PWD):$(PWD):rw \
 		-v $(HOME)/.m2:/home/builder/.m2:rw \
 		$(DOCKER_REGISTRY)/$(DOCKER_NAMESPACE)/streams-builder:6.$(shell uname -m) \

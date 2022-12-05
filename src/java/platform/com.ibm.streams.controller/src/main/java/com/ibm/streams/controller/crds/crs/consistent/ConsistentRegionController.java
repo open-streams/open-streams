@@ -28,7 +28,6 @@ import com.ibm.streams.controller.crds.crs.ConsistentRegionFactory;
 import com.ibm.streams.controller.crds.crs.ConsistentRegionList;
 import com.ibm.streams.controller.crds.crs.ConsistentRegionSpec;
 import com.ibm.streams.controller.crds.crs.ConsistentRegionStore;
-import com.ibm.streams.controller.crds.crs.DoneableConsistentRegion;
 import com.ibm.streams.controller.crds.crs.EConsistentRegionState;
 import com.ibm.streams.controller.crds.pes.ProcessingElementStore;
 import com.ibm.streams.controller.events.GenericEventQueueConsumer;
@@ -121,11 +120,7 @@ public class ConsistentRegionController extends GenericEventQueueConsumer<Consis
     controller =
         new Controller<>(
             client
-                .customResources(
-                    crFactory.getContext(),
-                    ConsistentRegion.class,
-                    ConsistentRegionList.class,
-                    DoneableConsistentRegion.class)
+                .resources(ConsistentRegion.class, ConsistentRegionList.class)
                 .inNamespace(ns)
                 .withLabel(STREAMS_JOB_LABEL_KEY, jobName),
             this);

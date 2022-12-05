@@ -22,29 +22,23 @@ import static org.junit.Assert.fail;
 import com.ibm.streams.controller.crds.cros.ConsistentRegionOperator;
 import com.ibm.streams.controller.crds.cros.ConsistentRegionOperatorFactory;
 import com.ibm.streams.controller.crds.cros.ConsistentRegionOperatorList;
-import com.ibm.streams.controller.crds.cros.DoneableConsistentRegionOperator;
 import com.ibm.streams.controller.crds.crs.ConsistentRegion;
 import com.ibm.streams.controller.crds.crs.ConsistentRegionFactory;
 import com.ibm.streams.controller.crds.crs.ConsistentRegionList;
-import com.ibm.streams.controller.crds.crs.DoneableConsistentRegion;
-import com.ibm.streams.controller.crds.exports.DoneableExport;
 import com.ibm.streams.controller.crds.exports.Export;
 import com.ibm.streams.controller.crds.exports.ExportController;
 import com.ibm.streams.controller.crds.exports.ExportCoordinator;
 import com.ibm.streams.controller.crds.exports.ExportFactory;
 import com.ibm.streams.controller.crds.exports.ExportList;
-import com.ibm.streams.controller.crds.hostpools.DoneableHostPool;
 import com.ibm.streams.controller.crds.hostpools.HostPool;
 import com.ibm.streams.controller.crds.hostpools.HostPoolFactory;
 import com.ibm.streams.controller.crds.hostpools.HostPoolList;
 import com.ibm.streams.controller.crds.hostpools.HostPoolStore;
-import com.ibm.streams.controller.crds.imports.DoneableImport;
 import com.ibm.streams.controller.crds.imports.Import;
 import com.ibm.streams.controller.crds.imports.ImportController;
 import com.ibm.streams.controller.crds.imports.ImportCoordinator;
 import com.ibm.streams.controller.crds.imports.ImportFactory;
 import com.ibm.streams.controller.crds.imports.ImportList;
-import com.ibm.streams.controller.crds.jobs.DoneableJob;
 import com.ibm.streams.controller.crds.jobs.EJobSubmissionStatus;
 import com.ibm.streams.controller.crds.jobs.Job;
 import com.ibm.streams.controller.crds.jobs.JobController;
@@ -52,14 +46,12 @@ import com.ibm.streams.controller.crds.jobs.JobFactory;
 import com.ibm.streams.controller.crds.jobs.JobList;
 import com.ibm.streams.controller.crds.jobs.JobStore;
 import com.ibm.streams.controller.crds.jobs.fsm.JobStateMachine;
-import com.ibm.streams.controller.crds.pes.DoneableProcessingElement;
 import com.ibm.streams.controller.crds.pes.ProcessingElement;
 import com.ibm.streams.controller.crds.pes.ProcessingElementFactory;
 import com.ibm.streams.controller.crds.pes.ProcessingElementList;
 import com.ibm.streams.controller.crds.pes.ProcessingElementStore;
 import com.ibm.streams.controller.crds.pes.instance.ProcessingElementController;
 import com.ibm.streams.controller.crds.pes.instance.ProcessingElementCoordinator;
-import com.ibm.streams.controller.crds.prs.DoneableParallelRegion;
 import com.ibm.streams.controller.crds.prs.IParallelRegionCoordinator;
 import com.ibm.streams.controller.crds.prs.ParallelRegion;
 import com.ibm.streams.controller.crds.prs.ParallelRegionController;
@@ -89,9 +81,6 @@ import com.ibm.streams.mock.server.KubernetesServer;
 import com.ibm.streams.utils.Probe;
 import io.fabric8.kubernetes.api.model.ConfigMap;
 import io.fabric8.kubernetes.api.model.ConfigMapList;
-import io.fabric8.kubernetes.api.model.DoneableConfigMap;
-import io.fabric8.kubernetes.api.model.DoneablePod;
-import io.fabric8.kubernetes.api.model.DoneableService;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.PodList;
 import io.fabric8.kubernetes.api.model.Service;
@@ -179,8 +168,8 @@ public class MockResource extends MockResourceBase {
 
   private CustomResourceDefinitionContext loadAndCreateCustomResourceContext(
       String fn, String name) {
-    client.customResourceDefinitions().load(CRDS_PATH + fn).create();
-    return client.customResourceDefinitions().list().getItems().stream()
+    client.apiextensions().v1().customResourceDefinitions().load(CRDS_PATH + fn).create();
+    return client.apiextensions().v1().customResourceDefinitions().list().getItems().stream()
         .filter(e -> e.getMetadata().getName().equals(name))
         .findAny()
         .map(CustomResourceDefinitionContext::fromCrd)
@@ -267,116 +256,81 @@ public class MockResource extends MockResourceBase {
     System.gc();
   }
 
-  public NonNamespaceOperation<Export, ExportList, DoneableExport, Resource<Export, DoneableExport>>
-      getExportClient() {
+  public NonNamespaceOperation<Export, ExportList, Resource<Export>> getExportClient() {
     assertNotNull(client);
     return client
-        .customResources(expContext, Export.class, ExportList.class, DoneableExport.class)
+        .customResources(expContext, Export.class, ExportList.class)
         .inNamespace(KUBE_NAMESPACE);
   }
 
-  public NonNamespaceOperation<Import, ImportList, DoneableImport, Resource<Import, DoneableImport>>
-      getImportClient() {
+  public NonNamespaceOperation<Import, ImportList, Resource<Import>> getImportClient() {
     assertNotNull(client);
     return client
-        .customResources(impContext, Import.class, ImportList.class, DoneableImport.class)
+        .customResources(impContext, Import.class, ImportList.class)
         .inNamespace(KUBE_NAMESPACE);
   }
 
-  public NonNamespaceOperation<
-          HostPool, HostPoolList, DoneableHostPool, Resource<HostPool, DoneableHostPool>>
-      getHostPoolClient() {
+  public NonNamespaceOperation<HostPool, HostPoolList, Resource<HostPool>> getHostPoolClient() {
     assertNotNull(client);
     return client
-        .customResources(hpContext, HostPool.class, HostPoolList.class, DoneableHostPool.class)
+        .customResources(hpContext, HostPool.class, HostPoolList.class)
         .inNamespace(KUBE_NAMESPACE);
   }
 
-  public NonNamespaceOperation<
-          ParallelRegion,
-          ParallelRegionList,
-          DoneableParallelRegion,
-          Resource<ParallelRegion, DoneableParallelRegion>>
+  public NonNamespaceOperation<ParallelRegion, ParallelRegionList, Resource<ParallelRegion>>
       getParallelRegionClient() {
     assertNotNull(client);
     return client
-        .customResources(
-            prContext, ParallelRegion.class, ParallelRegionList.class, DoneableParallelRegion.class)
+        .customResources(prContext, ParallelRegion.class, ParallelRegionList.class)
         .inNamespace(KUBE_NAMESPACE);
   }
 
-  public NonNamespaceOperation<Job, JobList, DoneableJob, Resource<Job, DoneableJob>>
-      getJobClient() {
+  public NonNamespaceOperation<Job, JobList, Resource<Job>> getJobClient() {
     assertNotNull(client);
-    return client
-        .customResources(jobContext, Job.class, JobList.class, DoneableJob.class)
-        .inNamespace(KUBE_NAMESPACE);
+    return client.customResources(jobContext, Job.class, JobList.class).inNamespace(KUBE_NAMESPACE);
   }
 
   public NonNamespaceOperation<
-          ProcessingElement,
-          ProcessingElementList,
-          DoneableProcessingElement,
-          Resource<ProcessingElement, DoneableProcessingElement>>
+          ProcessingElement, ProcessingElementList, Resource<ProcessingElement>>
       getPeClient() {
     assertNotNull(client);
     return client
-        .customResources(
-            peContext,
-            ProcessingElement.class,
-            ProcessingElementList.class,
-            DoneableProcessingElement.class)
+        .customResources(peContext, ProcessingElement.class, ProcessingElementList.class)
         .inNamespace(KUBE_NAMESPACE);
   }
 
-  public NonNamespaceOperation<
-          ConsistentRegion,
-          ConsistentRegionList,
-          DoneableConsistentRegion,
-          Resource<ConsistentRegion, DoneableConsistentRegion>>
+  public NonNamespaceOperation<ConsistentRegion, ConsistentRegionList, Resource<ConsistentRegion>>
       getCRClient() {
     assertNotNull(client);
     return client
-        .customResources(
-            crContext,
-            ConsistentRegion.class,
-            ConsistentRegionList.class,
-            DoneableConsistentRegion.class)
+        .customResources(crContext, ConsistentRegion.class, ConsistentRegionList.class)
         .inNamespace(KUBE_NAMESPACE);
   }
 
   public NonNamespaceOperation<
           ConsistentRegionOperator,
           ConsistentRegionOperatorList,
-          DoneableConsistentRegionOperator,
-          Resource<ConsistentRegionOperator, DoneableConsistentRegionOperator>>
+          Resource<ConsistentRegionOperator>>
       getCROClient() {
     assertNotNull(client);
     return client
         .customResources(
-            croContext,
-            ConsistentRegionOperator.class,
-            ConsistentRegionOperatorList.class,
-            DoneableConsistentRegionOperator.class)
+            croContext, ConsistentRegionOperator.class, ConsistentRegionOperatorList.class)
         .inNamespace(KUBE_NAMESPACE);
   }
 
-  public NonNamespaceOperation<Pod, PodList, DoneablePod, PodResource<Pod, DoneablePod>>
-      getPodClient() {
+  public NonNamespaceOperation<Pod, PodList, PodResource<Pod>> getPodClient() {
     assertNotNull(client);
     return client.pods().inNamespace(KUBE_NAMESPACE);
   }
 
-  private NonNamespaceOperation<
-          ConfigMap, ConfigMapList, DoneableConfigMap, Resource<ConfigMap, DoneableConfigMap>>
+  private NonNamespaceOperation<ConfigMap, ConfigMapList, Resource<ConfigMap>>
       getConfigMapClient() {
     assertNotNull(client);
     return client.configMaps().inNamespace(KUBE_NAMESPACE);
   }
 
-  public NonNamespaceOperation<
-          Service, ServiceList, DoneableService, ServiceResource<Service, DoneableService>>
-      getServiceClient() {
+  public NonNamespaceOperation<Service, ServiceList, ServiceResource<Service>> getServiceClient() {
     assertNotNull(client);
     return client.services().inNamespace(KUBE_NAMESPACE);
   }

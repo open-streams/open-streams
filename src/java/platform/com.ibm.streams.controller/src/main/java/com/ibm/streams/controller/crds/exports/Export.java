@@ -16,29 +16,16 @@
 
 package com.ibm.streams.controller.crds.exports;
 
+import com.ibm.streams.controller.crds.ICustomResourceCommons;
+import io.fabric8.kubernetes.api.model.Namespaced;
 import io.fabric8.kubernetes.client.CustomResource;
+import io.fabric8.kubernetes.model.annotation.Group;
+import io.fabric8.kubernetes.model.annotation.Plural;
+import io.fabric8.kubernetes.model.annotation.Singular;
+import io.fabric8.kubernetes.model.annotation.Version;
 
-public class Export extends CustomResource {
-
-  private ExportSpec spec;
-
-  @Override
-  public String toString() {
-    return "{ apiVersion='"
-        + getApiVersion()
-        + '\''
-        + ", metadata="
-        + getMetadata()
-        + ", spec="
-        + spec
-        + '}';
-  }
-
-  public ExportSpec getSpec() {
-    return spec;
-  }
-
-  public void setSpec(ExportSpec spec) {
-    this.spec = spec;
-  }
-}
+@Group(ICustomResourceCommons.STREAMS_CRD_GROUP)
+@Version(ICustomResourceCommons.STREAMS_CRD_VERSION)
+@Plural("streamsexports")
+@Singular("streamsexport")
+public class Export extends CustomResource<ExportSpec, Void> implements Namespaced {}

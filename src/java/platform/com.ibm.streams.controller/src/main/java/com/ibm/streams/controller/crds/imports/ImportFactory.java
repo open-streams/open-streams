@@ -16,7 +16,6 @@
 
 package com.ibm.streams.controller.crds.imports;
 
-import static com.ibm.streams.controller.crds.ICustomResourceCommons.STREAMS_API_VERSION;
 import static com.ibm.streams.controller.crds.ICustomResourceCommons.STREAMS_APP_LABEL_KEY;
 import static com.ibm.streams.controller.crds.ICustomResourceCommons.STREAMS_APP_LABEL_VALUE;
 import static com.ibm.streams.controller.crds.ICustomResourceCommons.STREAMS_APP_NAME_ANNOTATION_KEY;
@@ -34,8 +33,6 @@ import io.fabric8.kubernetes.api.model.DeletionPropagation;
 import io.fabric8.kubernetes.api.model.ObjectMeta;
 import io.fabric8.kubernetes.api.model.OwnerReference;
 import io.fabric8.kubernetes.client.KubernetesClient;
-import io.fabric8.kubernetes.client.dsl.base.CustomResourceDefinitionContext;
-import io.fabric8.kubernetes.internal.KubernetesDeserializer;
 import java.math.BigInteger;
 import java.util.Collections;
 import java.util.HashMap;
@@ -49,32 +46,9 @@ public class ImportFactory {
   private static final Logger LOGGER = LoggerFactory.getLogger(ImportFactory.class);
 
   private final KubernetesClient client;
-  private final CustomResourceDefinitionContext context;
 
   public ImportFactory(KubernetesClient client) {
-    /*
-     * Save the client handle.
-     */
     this.client = client;
-    /*
-     * Pre-register our CRD signature with the embedded JSON deserializer. This is a required step.
-     *
-     * See: fabric8io/kubernetes-client#1099
-     */
-    KubernetesDeserializer.registerCustomKind(STREAMS_API_VERSION, "Import", Import.class);
-    /*
-     * Look for the Import CRD.
-     */
-    this.context =
-        client.customResourceDefinitions().list().getItems().stream()
-            .filter(e -> e.getMetadata().getName().equals(STREAMS_IMPORT_CRD_NAME))
-            .findFirst()
-            .map(CustomResourceDefinitionContext::fromCrd)
-            .orElseThrow(RuntimeException::new);
-  }
-
-  public CustomResourceDefinitionContext getContext() {
-    return context;
   }
 
   /*
@@ -103,16 +77,14 @@ public class ImportFactory {
 
   public void deleteImport(Import imp) {
     LOGGER.debug("DEL {}", imp.getMetadata().getName());
-    client
-        .customResources(this.context, Import.class, ImportList.class, DoneableImport.class)
-        .delete(imp);
+    client.resources(Import.class, ImportList.class).delete(imp);
   }
 
   public void deleteImports(Job job) {
     /* FIXME(regression) https://github.com/fabric8io/kubernetes-client/issues/2745 */
     var list =
         client
-            .customResources(this.context, Import.class, ImportList.class, DoneableImport.class)
+            .resources(Import.class, ImportList.class)
             .inNamespace(job.getMetadata().getNamespace())
             .withLabel(STREAMS_JOB_LABEL_KEY, job.getMetadata().getName())
             .list();
@@ -171,7 +143,7 @@ public class ImportFactory {
      */
     LOGGER.debug("ADD {}", imp.getMetadata().getName());
     client
-        .customResources(this.context, Import.class, ImportList.class, DoneableImport.class)
+        .resources(Import.class, ImportList.class)
         .inNamespace(job.getMetadata().getNamespace())
         .create(imp);
   }
@@ -196,7 +168,7 @@ public class ImportFactory {
                */
               LOGGER.debug("UPD {}", imp.getMetadata().getName());
               client
-                  .customResources(context, Import.class, ImportList.class, DoneableImport.class)
+                  .resources(Import.class, ImportList.class)
                   .inNamespace(imp.getMetadata().getNamespace())
                   .withName(imp.getMetadata().getName())
                   .patch(target);
@@ -219,7 +191,7 @@ public class ImportFactory {
                */
               LOGGER.debug("UPD {}", imp.getMetadata().getName());
               client
-                  .customResources(context, Import.class, ImportList.class, DoneableImport.class)
+                  .resources(Import.class, ImportList.class)
                   .inNamespace(imp.getMetadata().getNamespace())
                   .withName(imp.getMetadata().getName())
                   .patch(target);
@@ -245,7 +217,7 @@ public class ImportFactory {
                */
               LOGGER.debug("UPD {}", imp.getMetadata().getName());
               client
-                  .customResources(context, Import.class, ImportList.class, DoneableImport.class)
+                  .resources(Import.class, ImportList.class)
                   .inNamespace(job.getMetadata().getNamespace())
                   .withName(imp.getMetadata().getName())
                   .patch(target);

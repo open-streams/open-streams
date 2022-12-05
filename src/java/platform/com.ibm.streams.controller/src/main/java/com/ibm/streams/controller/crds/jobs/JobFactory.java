@@ -16,7 +16,6 @@
 
 package com.ibm.streams.controller.crds.jobs;
 
-import static com.ibm.streams.controller.crds.ICustomResourceCommons.STREAMS_API_VERSION;
 import static com.ibm.streams.controller.crds.ICustomResourceCommons.STREAMS_APP_LABEL_KEY;
 import static com.ibm.streams.controller.crds.ICustomResourceCommons.STREAMS_APP_LABEL_VALUE;
 import static com.ibm.streams.controller.crds.ICustomResourceCommons.STREAMS_APP_NAME_ANNOTATION_KEY;
@@ -32,8 +31,6 @@ import com.ibm.streams.controller.instance.utils.RedisServiceConfigurator;
 import com.ibm.streams.controller.utils.ObjectUtils;
 import io.fabric8.kubernetes.api.model.DeletionPropagation;
 import io.fabric8.kubernetes.client.KubernetesClient;
-import io.fabric8.kubernetes.client.dsl.base.CustomResourceDefinitionContext;
-import io.fabric8.kubernetes.internal.KubernetesDeserializer;
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Optional;
@@ -50,32 +47,9 @@ public class JobFactory {
       STREAMS_JOB_PLURAL_NAME + "." + STREAMS_CRD_GROUP;
 
   private final KubernetesClient client;
-  private final CustomResourceDefinitionContext context;
 
   public JobFactory(KubernetesClient client) {
-    /*
-     * Save the client handle.
-     */
     this.client = client;
-    /*
-     * Pre-register our CRD signature with the embedded JSON deserializer. This is a required step.
-     *
-     * See: fabric8io/kubernetes-client#1099
-     */
-    KubernetesDeserializer.registerCustomKind(STREAMS_API_VERSION, "Job", Job.class);
-    /*
-     * Look for the Job CRD.
-     */
-    this.context =
-        client.customResourceDefinitions().list().getItems().stream()
-            .filter(e -> e.getMetadata().getName().equals(STREAMS_JOB_CRD_NAME))
-            .findFirst()
-            .map(CustomResourceDefinitionContext::fromCrd)
-            .orElseThrow(RuntimeException::new);
-  }
-
-  public CustomResourceDefinitionContext getContext() {
-    return context;
   }
 
   /*
@@ -96,7 +70,7 @@ public class JobFactory {
      */
     var rsrc =
         client
-            .customResources(context, Job.class, JobList.class, DoneableJob.class)
+            .resources(Job.class, JobList.class)
             .inNamespace(job.getMetadata().getNamespace())
             .withName(job.getMetadata().getName())
             .get();
@@ -123,7 +97,7 @@ public class JobFactory {
                */
               LOGGER.debug("UPD {}", job.getMetadata().getName());
               client
-                  .customResources(context, Job.class, JobList.class, DoneableJob.class)
+                  .resources(Job.class, JobList.class)
                   .inNamespace(job.getMetadata().getNamespace())
                   .withName(job.getMetadata().getName())
                   .patch(target);
@@ -201,7 +175,7 @@ public class JobFactory {
                */
               LOGGER.debug("UPD {}", job.getMetadata().getName());
               client
-                  .customResources(context, Job.class, JobList.class, DoneableJob.class)
+                  .resources(Job.class, JobList.class)
                   .inNamespace(job.getMetadata().getNamespace())
                   .withName(job.getMetadata().getName())
                   .replace(target);
@@ -228,7 +202,7 @@ public class JobFactory {
                */
               LOGGER.debug("RST {}", job.getMetadata().getName());
               client
-                  .customResources(context, Job.class, JobList.class, DoneableJob.class)
+                  .resources(Job.class, JobList.class)
                   .inNamespace(job.getMetadata().getNamespace())
                   .withName(job.getMetadata().getName())
                   .create(target);

@@ -21,7 +21,6 @@ import static com.ibm.streams.controller.crds.ICustomResourceCommons.STREAMS_JOB
 
 import com.ibm.streams.controller.crds.jobs.JobStore;
 import com.ibm.streams.controller.crds.pes.Connectivity;
-import com.ibm.streams.controller.crds.pes.DoneableProcessingElement;
 import com.ibm.streams.controller.crds.pes.ProcessingElement;
 import com.ibm.streams.controller.crds.pes.ProcessingElementFactory;
 import com.ibm.streams.controller.crds.pes.ProcessingElementList;
@@ -73,13 +72,7 @@ public class ProcessingElementController extends GenericEventQueueConsumer<Proce
      */
     controller =
         new Controller<>(
-            client
-                .customResources(
-                    this.factory.getContext(),
-                    ProcessingElement.class,
-                    ProcessingElementList.class,
-                    DoneableProcessingElement.class)
-                .inNamespace(ns),
+            client.resources(ProcessingElement.class, ProcessingElementList.class).inNamespace(ns),
             this);
   }
 

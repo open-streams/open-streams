@@ -16,7 +16,6 @@
 
 package com.ibm.streams.controller.crds.hostpools;
 
-import static com.ibm.streams.controller.crds.ICustomResourceCommons.STREAMS_API_VERSION;
 import static com.ibm.streams.controller.crds.ICustomResourceCommons.STREAMS_APP_LABEL_KEY;
 import static com.ibm.streams.controller.crds.ICustomResourceCommons.STREAMS_APP_LABEL_VALUE;
 import static com.ibm.streams.controller.crds.ICustomResourceCommons.STREAMS_APP_NAME_ANNOTATION_KEY;
@@ -32,8 +31,6 @@ import io.fabric8.kubernetes.api.model.DeletionPropagation;
 import io.fabric8.kubernetes.api.model.ObjectMeta;
 import io.fabric8.kubernetes.api.model.OwnerReference;
 import io.fabric8.kubernetes.client.KubernetesClient;
-import io.fabric8.kubernetes.client.dsl.base.CustomResourceDefinitionContext;
-import io.fabric8.kubernetes.internal.KubernetesDeserializer;
 import java.math.BigInteger;
 import java.util.Collections;
 import java.util.HashMap;
@@ -49,32 +46,9 @@ public class HostPoolFactory {
   private static final Logger LOGGER = LoggerFactory.getLogger(HostPoolFactory.class);
 
   private final KubernetesClient client;
-  private final CustomResourceDefinitionContext context;
 
   public HostPoolFactory(KubernetesClient client) {
-    /*
-     * Save the client handle.
-     */
     this.client = client;
-    /*
-     * Pre-register our CRD signature with the embedded JSON deserializer. This is a required step.
-     *
-     * See: fabric8io/kubernetes-client#1099
-     */
-    KubernetesDeserializer.registerCustomKind(STREAMS_API_VERSION, "HostPool", HostPool.class);
-    /*
-     * Look for the HostPool CRD.
-     */
-    this.context =
-        client.customResourceDefinitions().list().getItems().stream()
-            .filter(e -> e.getMetadata().getName().equals(STREAMS_HOSTPOOL_CRD_NAME))
-            .findFirst()
-            .map(CustomResourceDefinitionContext::fromCrd)
-            .orElseThrow(RuntimeException::new);
-  }
-
-  public CustomResourceDefinitionContext getContext() {
-    return context;
   }
 
   /*
@@ -137,7 +111,7 @@ public class HostPoolFactory {
      * Create the hostpool.
      */
     client
-        .customResources(context, HostPool.class, HostPoolList.class, DoneableHostPool.class)
+        .resources(HostPool.class, HostPoolList.class)
         .inNamespace(job.getMetadata().getNamespace())
         .createOrReplace(hostpool);
   }
@@ -146,7 +120,7 @@ public class HostPoolFactory {
     /* FIXME(regression) https://github.com/fabric8io/kubernetes-client/issues/2745 */
     var list =
         client
-            .customResources(context, HostPool.class, HostPoolList.class, DoneableHostPool.class)
+            .resources(HostPool.class, HostPoolList.class)
             .inNamespace(job.getMetadata().getNamespace())
             .withLabel(STREAMS_JOB_LABEL_KEY, job.getMetadata().getName())
             .list();
