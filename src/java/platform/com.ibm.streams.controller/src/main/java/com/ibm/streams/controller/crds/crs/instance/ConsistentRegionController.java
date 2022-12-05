@@ -17,7 +17,6 @@
 package com.ibm.streams.controller.crds.crs.instance;
 
 import com.ibm.streams.controller.crds.crs.ConsistentRegion;
-import com.ibm.streams.controller.crds.crs.ConsistentRegionFactory;
 import com.ibm.streams.controller.crds.crs.ConsistentRegionList;
 import com.ibm.streams.controller.crds.crs.ConsistentRegionStore;
 import com.ibm.streams.controller.events.GenericEventQueueConsumer;
@@ -35,10 +34,7 @@ public class ConsistentRegionController extends GenericEventQueueConsumer<Consis
   private final Controller<ConsistentRegion> controller;
 
   public ConsistentRegionController(
-      KubernetesClient client,
-      ConsistentRegionStore crStore,
-      ConsistentRegionFactory crFactory,
-      String ns) {
+      KubernetesClient client, ConsistentRegionStore crStore, String ns) {
     /*
      * Super constructor.
      */
@@ -48,10 +44,7 @@ public class ConsistentRegionController extends GenericEventQueueConsumer<Consis
      */
     controller =
         new Controller<>(
-            client
-                .customResources(
-                    crFactory.getContext(), ConsistentRegion.class, ConsistentRegionList.class)
-                .inNamespace(ns),
+            client.resources(ConsistentRegion.class, ConsistentRegionList.class).inNamespace(ns),
             this);
   }
 

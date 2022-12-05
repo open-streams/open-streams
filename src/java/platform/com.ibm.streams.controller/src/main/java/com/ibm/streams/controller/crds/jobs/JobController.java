@@ -77,11 +77,7 @@ public class JobController extends GenericEventQueueConsumer<Job> {
      * Create the controller.
      */
     this.controller =
-        new Controller<>(
-            client
-                .customResources(jobFactory.getContext(), Job.class, JobList.class)
-                .inNamespace(ns),
-            this);
+        new Controller<>(client.resources(Job.class, JobList.class).inNamespace(ns), this);
     this.currentJobId = BigInteger.ZERO;
   }
 

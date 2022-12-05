@@ -16,7 +16,6 @@
 
 package com.ibm.streams.controller.crds.pes;
 
-import static com.ibm.streams.controller.crds.ICustomResourceCommons.STREAMS_API_VERSION;
 import static com.ibm.streams.controller.crds.ICustomResourceCommons.STREAMS_APP_LABEL_KEY;
 import static com.ibm.streams.controller.crds.ICustomResourceCommons.STREAMS_APP_LABEL_VALUE;
 import static com.ibm.streams.controller.crds.ICustomResourceCommons.STREAMS_APP_NAME_ANNOTATION_KEY;
@@ -36,8 +35,6 @@ import io.fabric8.kubernetes.api.model.DeletionPropagation;
 import io.fabric8.kubernetes.api.model.ObjectMeta;
 import io.fabric8.kubernetes.api.model.OwnerReference;
 import io.fabric8.kubernetes.client.KubernetesClient;
-import io.fabric8.kubernetes.client.dsl.base.CustomResourceDefinitionContext;
-import io.fabric8.kubernetes.internal.KubernetesDeserializer;
 import java.util.Collections;
 import java.util.HashMap;
 import lombok.var;
@@ -52,51 +49,9 @@ public class ProcessingElementFactory {
   public static final String STREAMS_PE_CRD_NAME = STREAMS_PE_PLURAL_NAME + "." + STREAMS_CRD_GROUP;
 
   private final KubernetesClient client;
-  private final CustomResourceDefinitionContext context;
 
   public ProcessingElementFactory(KubernetesClient client) {
-    /*
-     * Save the client handle.
-     */
     this.client = client;
-    /*
-     * Pre-register our CRD signature with the embedded JSON deserializer. This is a required step.
-     *
-     * See: fabric8io/kubernetes-client#1099
-     */
-    KubernetesDeserializer.registerCustomKind(
-        STREAMS_API_VERSION, "ProcessingElement", ProcessingElement.class);
-    /*
-     * Look for the Pe CRD.
-     */
-    this.context =
-        client.apiextensions().v1().customResourceDefinitions().list().getItems().stream()
-            .filter(e -> e.getMetadata().getName().equals(STREAMS_PE_CRD_NAME))
-            .findFirst()
-            .map(CustomResourceDefinitionContext::fromCrd)
-            .orElseThrow(RuntimeException::new);
-  }
-
-  public static CustomResourceDefinitionContext getContext(KubernetesClient client) {
-    /*
-     * Pre-register our CRD signature with the embedded JSON deserializer. This is a required step.
-     *
-     * See: fabric8io/kubernetes-client#1099
-     */
-    KubernetesDeserializer.registerCustomKind(
-        STREAMS_API_VERSION, "ProcessingElement", ProcessingElement.class);
-    /*
-     * Look for the Pe CRD.
-     */
-    return client.apiextensions().v1().customResourceDefinitions().list().getItems().stream()
-        .filter(e -> e.getMetadata().getName().equals(STREAMS_PE_CRD_NAME))
-        .findFirst()
-        .map(CustomResourceDefinitionContext::fromCrd)
-        .orElseThrow(RuntimeException::new);
-  }
-
-  public CustomResourceDefinitionContext getContext() {
-    return context;
   }
 
   /*
@@ -154,7 +109,7 @@ public class ProcessingElementFactory {
      */
     LOGGER.debug("ADD {}", pe.getMetadata().getName());
     client
-        .customResources(this.context, ProcessingElement.class, ProcessingElementList.class)
+        .resources(ProcessingElement.class, ProcessingElementList.class)
         .inNamespace(job.getMetadata().getNamespace())
         .createOrReplace(pe);
   }
@@ -170,7 +125,7 @@ public class ProcessingElementFactory {
      * NOTE(xrg) It is possible, albeit not required, to use the Foreground propagation policy here.
      */
     client
-        .customResources(this.context, ProcessingElement.class, ProcessingElementList.class)
+        .resources(ProcessingElement.class, ProcessingElementList.class)
         .inNamespace(pe.getMetadata().getNamespace())
         .withName(pe.getMetadata().getName())
         .withPropagationPolicy(DeletionPropagation.BACKGROUND)
@@ -181,7 +136,7 @@ public class ProcessingElementFactory {
     /* FIXME(regression) https://github.com/fabric8io/kubernetes-client/issues/2745 */
     var list =
         client
-            .customResources(this.context, ProcessingElement.class, ProcessingElementList.class)
+            .resources(ProcessingElement.class, ProcessingElementList.class)
             .inNamespace(job.getMetadata().getNamespace())
             .withLabel(STREAMS_JOB_LABEL_KEY, job.getMetadata().getName())
             .list();
@@ -208,8 +163,7 @@ public class ProcessingElementFactory {
                */
               LOGGER.debug("UPD {}", pe.getMetadata().getName());
               client
-                  .customResources(
-                      this.context, ProcessingElement.class, ProcessingElementList.class)
+                  .resources(ProcessingElement.class, ProcessingElementList.class)
                   .inNamespace(pe.getMetadata().getNamespace())
                   .withName(pe.getMetadata().getName())
                   .patch(target);
@@ -232,8 +186,7 @@ public class ProcessingElementFactory {
                */
               LOGGER.debug("UPD {}", pe.getMetadata().getName());
               client
-                  .customResources(
-                      this.context, ProcessingElement.class, ProcessingElementList.class)
+                  .resources(ProcessingElement.class, ProcessingElementList.class)
                   .inNamespace(pe.getMetadata().getNamespace())
                   .withName(pe.getMetadata().getName())
                   .patch(target);
@@ -259,8 +212,7 @@ public class ProcessingElementFactory {
                */
               LOGGER.debug("UPD {}", pe.getMetadata().getName());
               client
-                  .customResources(
-                      this.context, ProcessingElement.class, ProcessingElementList.class)
+                  .resources(ProcessingElement.class, ProcessingElementList.class)
                   .inNamespace(job.getMetadata().getNamespace())
                   .withName(pe.getMetadata().getName())
                   .patch(target);
@@ -291,8 +243,7 @@ public class ProcessingElementFactory {
                */
               LOGGER.debug("UPD {}", pe.getMetadata().getName());
               client
-                  .customResources(
-                      this.context, ProcessingElement.class, ProcessingElementList.class)
+                  .resources(ProcessingElement.class, ProcessingElementList.class)
                   .inNamespace(job.getMetadata().getNamespace())
                   .withName(pe.getMetadata().getName())
                   .patch(target);

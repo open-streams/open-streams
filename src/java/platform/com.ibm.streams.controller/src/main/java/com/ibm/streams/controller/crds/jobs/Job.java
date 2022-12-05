@@ -19,8 +19,12 @@ package com.ibm.streams.controller.crds.jobs;
 import com.ibm.streams.controller.crds.ICustomResourceCommons;
 import io.fabric8.kubernetes.client.CustomResource;
 import io.fabric8.kubernetes.model.annotation.Group;
+import io.fabric8.kubernetes.model.annotation.Plural;
+import io.fabric8.kubernetes.model.annotation.Singular;
 import io.fabric8.kubernetes.model.annotation.Version;
 
 @Group(ICustomResourceCommons.STREAMS_CRD_GROUP)
 @Version(ICustomResourceCommons.STREAMS_CRD_VERSION)
+@Plural("streamsjobs")
+@Singular("streamsjob")
 public class Job extends CustomResource<JobSpec, Void> {}

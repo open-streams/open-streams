@@ -16,7 +16,6 @@
 
 package com.ibm.streams.controller.crds.crs;
 
-import static com.ibm.streams.controller.crds.ICustomResourceCommons.STREAMS_API_VERSION;
 import static com.ibm.streams.controller.crds.ICustomResourceCommons.STREAMS_CRD_GROUP;
 import static com.ibm.streams.controller.crds.ICustomResourceCommons.STREAMS_CRD_VERSION;
 import static com.ibm.streams.controller.crds.ICustomResourceCommons.STREAMS_CR_LABEL_KEY;
@@ -29,8 +28,6 @@ import io.fabric8.kubernetes.api.model.DeletionPropagation;
 import io.fabric8.kubernetes.api.model.ObjectMeta;
 import io.fabric8.kubernetes.api.model.OwnerReference;
 import io.fabric8.kubernetes.client.KubernetesClient;
-import io.fabric8.kubernetes.client.dsl.base.CustomResourceDefinitionContext;
-import io.fabric8.kubernetes.internal.KubernetesDeserializer;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -46,30 +43,9 @@ public class ConsistentRegionFactory {
   private static final Logger LOGGER = LoggerFactory.getLogger(ConsistentRegionFactory.class);
 
   private final KubernetesClient client;
-  private final CustomResourceDefinitionContext context;
 
   public ConsistentRegionFactory(KubernetesClient client) {
-    /*
-     * Save the client handle.
-     */
     this.client = client;
-
-    KubernetesDeserializer.registerCustomKind(
-        STREAMS_API_VERSION, "ConsistentRegion", ConsistentRegion.class);
-
-    /*
-     * Look for the ConsistentRegion CRD.
-     */
-    this.context =
-        client.apiextensions().v1().customResourceDefinitions().list().getItems().stream()
-            .filter(e -> e.getMetadata().getName().equals(STREAMS_CR_CRD_NAME))
-            .findFirst()
-            .map(CustomResourceDefinitionContext::fromCrd)
-            .orElseThrow(RuntimeException::new);
-  }
-
-  public CustomResourceDefinitionContext getContext() {
-    return context;
   }
 
   /*
@@ -141,7 +117,7 @@ public class ConsistentRegionFactory {
      * Create the consistent region.
      */
     client
-        .customResources(this.context, ConsistentRegion.class, ConsistentRegionList.class)
+        .resources(ConsistentRegion.class, ConsistentRegionList.class)
         .inNamespace(meta.getNamespace())
         .createOrReplace(cr);
   }
@@ -150,7 +126,7 @@ public class ConsistentRegionFactory {
     /* FIXME(regression) https://github.com/fabric8io/kubernetes-client/issues/2745 */
     var list =
         client
-            .customResources(this.context, ConsistentRegion.class, ConsistentRegionList.class)
+            .resources(ConsistentRegion.class, ConsistentRegionList.class)
             .inNamespace(job.getMetadata().getNamespace())
             .withLabel(STREAMS_JOB_LABEL_KEY, job.getMetadata().getName())
             .list();
@@ -210,7 +186,7 @@ public class ConsistentRegionFactory {
                * Update the consistent region.
                */
               client
-                  .customResources(this.context, ConsistentRegion.class, ConsistentRegionList.class)
+                  .resources(ConsistentRegion.class, ConsistentRegionList.class)
                   .inNamespace(cr.getMetadata().getNamespace())
                   .withName(cr.getMetadata().getName())
                   .patch(target);

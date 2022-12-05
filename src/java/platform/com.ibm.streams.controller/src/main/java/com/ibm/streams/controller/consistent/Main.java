@@ -119,10 +119,7 @@ public class Main {
       String croName = jobName + "-consistent-region-operator";
       ConsistentRegionOperator consistentRegionOperator =
           client
-              .customResources(
-                  croFactory.getContext(),
-                  ConsistentRegionOperator.class,
-                  ConsistentRegionOperatorList.class)
+              .resources(ConsistentRegionOperator.class, ConsistentRegionOperatorList.class)
               .inNamespace(myNs)
               .withName(croName)
               .get();

@@ -72,10 +72,7 @@ public class ProcessingElementController extends GenericEventQueueConsumer<Proce
      */
     controller =
         new Controller<>(
-            client
-                .customResources(
-                    this.factory.getContext(), ProcessingElement.class, ProcessingElementList.class)
-                .inNamespace(ns),
+            client.resources(ProcessingElement.class, ProcessingElementList.class).inNamespace(ns),
             this);
   }
 

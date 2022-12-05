@@ -54,11 +54,7 @@ public class ImportController extends GenericEventQueueConsumer<Import> {
      * Create the controller.
      */
     controller =
-        new Controller<>(
-            client
-                .customResources(factory.getContext(), Import.class, ImportList.class)
-                .inNamespace(ns),
-            this);
+        new Controller<>(client.resources(Import.class, ImportList.class).inNamespace(ns), this);
   }
 
   @Override

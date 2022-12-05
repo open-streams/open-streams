@@ -16,7 +16,6 @@
 
 package com.ibm.streams.controller.crds.prs;
 
-import static com.ibm.streams.controller.crds.ICustomResourceCommons.STREAMS_API_VERSION;
 import static com.ibm.streams.controller.crds.ICustomResourceCommons.STREAMS_APP_LABEL_KEY;
 import static com.ibm.streams.controller.crds.ICustomResourceCommons.STREAMS_APP_LABEL_VALUE;
 import static com.ibm.streams.controller.crds.ICustomResourceCommons.STREAMS_APP_NAME_ANNOTATION_KEY;
@@ -32,8 +31,6 @@ import io.fabric8.kubernetes.api.model.DeletionPropagation;
 import io.fabric8.kubernetes.api.model.ObjectMeta;
 import io.fabric8.kubernetes.api.model.OwnerReference;
 import io.fabric8.kubernetes.client.KubernetesClient;
-import io.fabric8.kubernetes.client.dsl.base.CustomResourceDefinitionContext;
-import io.fabric8.kubernetes.internal.KubernetesDeserializer;
 import java.math.BigInteger;
 import java.util.Collections;
 import java.util.HashMap;
@@ -47,33 +44,9 @@ public class ParallelRegionFactory {
   private static final Logger LOGGER = LoggerFactory.getLogger(ParallelRegionFactory.class);
 
   private final KubernetesClient client;
-  private final CustomResourceDefinitionContext context;
 
   public ParallelRegionFactory(KubernetesClient client) {
-    /*
-     * Save the client handle.
-     */
     this.client = client;
-    /*
-     * Pre-register our CRD signature with the embedded JSON deserializer. This is a required step.
-     *
-     * See: fabric8io/kubernetes-client#1099
-     */
-    KubernetesDeserializer.registerCustomKind(
-        STREAMS_API_VERSION, "ParallelRegion", ParallelRegion.class);
-    /*
-     * Look for the ParallelRegion CRD.
-     */
-    this.context =
-        client.apiextensions().v1().customResourceDefinitions().list().getItems().stream()
-            .filter(e -> e.getMetadata().getName().equals(STREAMS_HOSTPOOL_CRD_NAME))
-            .findFirst()
-            .map(CustomResourceDefinitionContext::fromCrd)
-            .orElseThrow(RuntimeException::new);
-  }
-
-  public CustomResourceDefinitionContext getContext() {
-    return context;
   }
 
   /*
@@ -137,21 +110,22 @@ public class ParallelRegionFactory {
      */
     LOGGER.debug("ADD {}", pr.getMetadata().getName());
     client
-        .customResources(context, ParallelRegion.class, ParallelRegionList.class)
+        .resources(ParallelRegion.class, ParallelRegionList.class)
         .inNamespace(job.getMetadata().getNamespace())
         .createOrReplace(pr);
   }
 
+  @SuppressWarnings("unused")
   public void deleteParallelRegion(ParallelRegion pr) {
     LOGGER.debug("DEL {}", pr.getMetadata().getName());
-    client.customResources(context, ParallelRegion.class, ParallelRegionList.class).delete(pr);
+    client.resources(ParallelRegion.class, ParallelRegionList.class).delete(pr);
   }
 
   public void deleteParallelRegions(Job job) {
     /* FIXME(regression) https://github.com/fabric8io/kubernetes-client/issues/2745 */
     var list =
         client
-            .customResources(context, ParallelRegion.class, ParallelRegionList.class)
+            .resources(ParallelRegion.class, ParallelRegionList.class)
             .inNamespace(job.getMetadata().getNamespace())
             .withLabel(STREAMS_JOB_LABEL_KEY, job.getMetadata().getName())
             .list();
@@ -178,7 +152,7 @@ public class ParallelRegionFactory {
                */
               LOGGER.debug("UPD {}", pr.getMetadata().getName());
               client
-                  .customResources(context, ParallelRegion.class, ParallelRegionList.class)
+                  .resources(ParallelRegion.class, ParallelRegionList.class)
                   .inNamespace(pr.getMetadata().getNamespace())
                   .withName(pr.getMetadata().getName())
                   .patch(target);
@@ -204,7 +178,7 @@ public class ParallelRegionFactory {
                */
               LOGGER.debug("UPD {}", pr.getMetadata().getName());
               client
-                  .customResources(context, ParallelRegion.class, ParallelRegionList.class)
+                  .resources(ParallelRegion.class, ParallelRegionList.class)
                   .inNamespace(pr.getMetadata().getNamespace())
                   .withName(pr.getMetadata().getName())
                   .patch(target);

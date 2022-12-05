@@ -16,16 +16,12 @@
 
 package com.ibm.streams.controller.crds.cros;
 
-import static com.ibm.streams.controller.crds.ICustomResourceCommons.STREAMS_CRD_GROUP;
-import static com.ibm.streams.controller.crds.ICustomResourceCommons.STREAMS_CRD_VERSION;
-
 import com.ibm.streams.controller.events.GenericEventQueueConsumer;
 import com.ibm.streams.controller.k8s.deployments.DeploymentFactory;
 import com.ibm.streams.controller.k8s.services.ServiceFactory;
 import com.ibm.streams.controller.k8s.utils.TimeUtils;
 import com.ibm.streams.controller.utils.CommonEnvironment;
 import io.fabric8.kubernetes.client.KubernetesClient;
-import io.fabric8.kubernetes.internal.KubernetesDeserializer;
 import java.io.IOException;
 import java.time.Instant;
 import lombok.var;
@@ -51,7 +47,6 @@ public class ConsistentRegionOperatorController
   public ConsistentRegionOperatorController(
       Instant creationTime,
       KubernetesClient client,
-      ConsistentRegionOperatorFactory factory,
       ConsistentRegionOperatorStore croStore,
       ServiceFactory svcFactory,
       DeploymentFactory depFactory,
@@ -71,21 +66,12 @@ public class ConsistentRegionOperatorController
     this.namespace = ns;
     this.env = env;
     /*
-     * Register the custom kind with the deserializer.
-     */
-    KubernetesDeserializer.registerCustomKind(
-        STREAMS_CRD_GROUP + "/" + STREAMS_CRD_VERSION + "#ConsistentRegionOperator",
-        ConsistentRegionOperator.class);
-    /*
      * Create the controller.
      */
     controller =
         new Controller<>(
             client
-                .customResources(
-                    factory.getContext(),
-                    ConsistentRegionOperator.class,
-                    ConsistentRegionOperatorList.class)
+                .resources(ConsistentRegionOperator.class, ConsistentRegionOperatorList.class)
                 .inNamespace(ns),
             this);
   }

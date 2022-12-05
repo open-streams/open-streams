@@ -120,8 +120,7 @@ public class ConsistentRegionController extends GenericEventQueueConsumer<Consis
     controller =
         new Controller<>(
             client
-                .customResources(
-                    crFactory.getContext(), ConsistentRegion.class, ConsistentRegionList.class)
+                .resources(ConsistentRegion.class, ConsistentRegionList.class)
                 .inNamespace(ns)
                 .withLabel(STREAMS_JOB_LABEL_KEY, jobName),
             this);

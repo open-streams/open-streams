@@ -30,8 +30,7 @@ public class HostPoolController extends GenericEventQueueConsumer<HostPool> {
 
   private final Controller<HostPool> controller;
 
-  public HostPoolController(
-      KubernetesClient client, HostPoolStore store, HostPoolFactory factory, String ns) {
+  public HostPoolController(KubernetesClient client, HostPoolStore store, String ns) {
     /*
      * Super constructor.
      */
@@ -41,10 +40,7 @@ public class HostPoolController extends GenericEventQueueConsumer<HostPool> {
      */
     controller =
         new Controller<>(
-            client
-                .customResources(factory.getContext(), HostPool.class, HostPoolList.class)
-                .inNamespace(ns),
-            this);
+            client.resources(HostPool.class, HostPoolList.class).inNamespace(ns), this);
   }
 
   /*

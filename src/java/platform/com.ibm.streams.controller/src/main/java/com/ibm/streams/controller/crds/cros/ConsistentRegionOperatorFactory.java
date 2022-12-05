@@ -31,7 +31,6 @@ import com.ibm.streams.controller.utils.ObjectUtils;
 import io.fabric8.kubernetes.api.model.ObjectMeta;
 import io.fabric8.kubernetes.api.model.OwnerReference;
 import io.fabric8.kubernetes.client.KubernetesClient;
-import io.fabric8.kubernetes.client.dsl.base.CustomResourceDefinitionContext;
 import java.util.Collections;
 import java.util.HashMap;
 import lombok.var;
@@ -41,27 +40,9 @@ public class ConsistentRegionOperatorFactory {
   public static final String STREAMS_CRO_CRD_NAME = "streamscros." + STREAMS_CRD_GROUP;
 
   private final KubernetesClient client;
-  private final CustomResourceDefinitionContext context;
 
   public ConsistentRegionOperatorFactory(KubernetesClient client) {
-    /*
-     * Save the client handle.
-     */
     this.client = client;
-
-    /*
-     * Look for the ConsistentRegionOperator CRD.
-     */
-    this.context =
-        client.apiextensions().v1().customResourceDefinitions().list().getItems().stream()
-            .filter(e -> e.getMetadata().getName().equals(STREAMS_CRO_CRD_NAME))
-            .findFirst()
-            .map(CustomResourceDefinitionContext::fromCrd)
-            .orElseThrow(RuntimeException::new);
-  }
-
-  public CustomResourceDefinitionContext getContext() {
-    return context;
   }
 
   public void addConsistentRegionOperator(Job job, Integer numRegions, CommonEnvironment env) {
@@ -121,8 +102,7 @@ public class ConsistentRegionOperatorFactory {
      * Create the ConsistentRegionOperator.
      */
     client
-        .customResources(
-            this.getContext(), ConsistentRegionOperator.class, ConsistentRegionOperatorList.class)
+        .resources(ConsistentRegionOperator.class, ConsistentRegionOperatorList.class)
         .inNamespace(job.getMetadata().getNamespace())
         .create(cro);
   }
@@ -142,10 +122,7 @@ public class ConsistentRegionOperatorFactory {
                * Update the new CRO.
                */
               client
-                  .customResources(
-                      this.context,
-                      ConsistentRegionOperator.class,
-                      ConsistentRegionOperatorList.class)
+                  .resources(ConsistentRegionOperator.class, ConsistentRegionOperatorList.class)
                   .inNamespace(cro.getMetadata().getNamespace())
                   .withName(cro.getMetadata().getName())
                   .patch(target);

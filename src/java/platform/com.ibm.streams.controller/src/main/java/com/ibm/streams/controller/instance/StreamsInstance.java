@@ -251,21 +251,18 @@ public class StreamsInstance implements IStreamsInstance {
     this.configMapController =
         new ConfigMapController(client, configMapStore, configMapFactory, configMapCache, ns);
     this.consistentRegionController =
-        new ConsistentRegionController(
-            client, consistentRegionStore,
-            consistentRegionFactory, ns);
+        new ConsistentRegionController(client, consistentRegionStore, ns);
     this.consistentRegionOperatorController =
         new ConsistentRegionOperatorController(
             creationTime,
             client,
-            consistentRegionOperatorFactory,
             consistentRegionOperatorStore,
             serviceFactory,
             deploymentFactory,
             ns,
             env);
     this.exportController = new ExportController(client, exportStore, exportFactory, jobStore, ns);
-    this.hostPoolController = new HostPoolController(client, hostPoolStore, hostPoolFactory, ns);
+    this.hostPoolController = new HostPoolController(client, hostPoolStore, ns);
     this.importController = new ImportController(client, importStore, importFactory, jobStore, ns);
     this.jobController =
         new JobController(creationTime, client, jobFactory, jobStore, jobLauncher, ns, env);
