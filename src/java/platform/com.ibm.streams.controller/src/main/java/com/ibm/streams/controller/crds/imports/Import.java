@@ -17,6 +17,7 @@
 package com.ibm.streams.controller.crds.imports;
 
 import com.ibm.streams.controller.crds.ICustomResourceCommons;
+import io.fabric8.kubernetes.api.model.Namespaced;
 import io.fabric8.kubernetes.client.CustomResource;
 import io.fabric8.kubernetes.model.annotation.Group;
 import io.fabric8.kubernetes.model.annotation.Plural;
@@ -27,4 +28,4 @@ import io.fabric8.kubernetes.model.annotation.Version;
 @Version(ICustomResourceCommons.STREAMS_CRD_VERSION)
 @Plural("streamsimports")
 @Singular("streamsimport")
-public class Import extends CustomResource<ImportSpec, Void> {}
+public class Import extends CustomResource<ImportSpec, Void> implements Namespaced {}

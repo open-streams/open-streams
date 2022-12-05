@@ -409,7 +409,7 @@ public class KubernetesServer implements HttpHandler {
     /*
      * Parse and execute the query.
      */
-    var query = attributesExtractor.extract(path);
+    var query = attributesExtractor.fromPath(path);
     var items = doGet(query);
     if (items.isEmpty()) {
       ex.sendResponseHeaders(HttpURLConnection.HTTP_NOT_FOUND, -1);
@@ -462,7 +462,7 @@ public class KubernetesServer implements HttpHandler {
     /*
      * Parse and execute the query.
      */
-    var query = attributesExtractor.extract(path);
+    var query = attributesExtractor.fromPath(path);
     var items = doGet(query);
     if (items.isEmpty()) {
       ex.sendResponseHeaders(HttpURLConnection.HTTP_NOT_FOUND, -1);
@@ -511,7 +511,7 @@ public class KubernetesServer implements HttpHandler {
 
   private void handleGet(HttpExchange ex) throws IOException {
     var path = ex.getRequestURI().toString();
-    var query = attributesExtractor.extract(path);
+    var query = attributesExtractor.fromPath(path);
     var items = doGet(query);
     LOGGER.trace("GET {} - {}", path, items.size());
     /*
@@ -538,7 +538,7 @@ public class KubernetesServer implements HttpHandler {
 
   private void handleWatch(HttpExchange ex, Map<String, String> fields) throws IOException {
     var path = ex.getRequestURI().toString();
-    var query = attributesExtractor.extract(path);
+    var query = attributesExtractor.fromPath(path);
     var version =
         fields.containsKey("resourceVersion") ? Integer.parseInt(fields.get("resourceVersion")) : 0;
     var items = doWatch(query, version);
@@ -584,7 +584,7 @@ public class KubernetesServer implements HttpHandler {
     /*
      * Perform the query.
      */
-    var query = attributesExtractor.extract(path);
+    var query = attributesExtractor.fromPath(path);
     var items = doGet(query);
     if (items.isEmpty()) {
       ex.sendResponseHeaders(HttpURLConnection.HTTP_NOT_FOUND, -1);

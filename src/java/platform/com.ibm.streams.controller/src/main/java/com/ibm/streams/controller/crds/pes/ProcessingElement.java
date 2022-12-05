@@ -17,6 +17,7 @@
 package com.ibm.streams.controller.crds.pes;
 
 import com.ibm.streams.controller.crds.ICustomResourceCommons;
+import io.fabric8.kubernetes.api.model.Namespaced;
 import io.fabric8.kubernetes.client.CustomResource;
 import io.fabric8.kubernetes.model.annotation.Group;
 import io.fabric8.kubernetes.model.annotation.Plural;
@@ -27,4 +28,5 @@ import io.fabric8.kubernetes.model.annotation.Version;
 @Version(ICustomResourceCommons.STREAMS_CRD_VERSION)
 @Plural("streamspes")
 @Singular("streamspe")
-public class ProcessingElement extends CustomResource<ProcessingElementSpec, Void> {}
+public class ProcessingElement extends CustomResource<ProcessingElementSpec, Void>
+    implements Namespaced {}
