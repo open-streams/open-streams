@@ -102,7 +102,7 @@ import java.util.concurrent.TimeUnit;
 import lombok.var;
 import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
-import org.microbean.kubernetes.controller.Controller;
+import fr.xenogenics.kubernetes.controller.Controller;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
 public class MockResource extends MockResourceBase {

@@ -21,7 +21,7 @@ import static com.ibm.streams.controller.crds.ICustomResourceCommons.STREAMS_GEN
 import com.ibm.streams.controller.crds.jobs.Job;
 import com.ibm.streams.controller.crds.pes.instance.IProcessingElementCoordinator;
 import lombok.var;
-import org.microbean.kubernetes.controller.AbstractEvent;
+import fr.xenogenics.kubernetes.controller.AbstractEvent;
 
 public class MockProcessingElementCoordinator implements IProcessingElementCoordinator {
 

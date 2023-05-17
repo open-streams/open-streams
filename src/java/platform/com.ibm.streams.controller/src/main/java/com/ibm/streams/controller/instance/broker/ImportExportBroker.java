@@ -49,7 +49,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.var;
-import org.microbean.kubernetes.controller.AbstractEvent;
+import fr.xenogenics.kubernetes.controller.AbstractEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

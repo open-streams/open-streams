@@ -20,7 +20,7 @@ import static com.ibm.streams.controller.crds.ICustomResourceCommons.STREAMS_GEN
 
 import com.ibm.streams.controller.crds.jobs.Job;
 import java.math.BigInteger;
-import org.microbean.kubernetes.controller.AbstractEvent;
+import fr.xenogenics.kubernetes.controller.AbstractEvent;
 
 public class MockParallelRegionCoordinator implements IParallelRegionCoordinator {
 

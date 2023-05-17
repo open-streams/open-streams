@@ -23,7 +23,7 @@ import io.fabric8.kubernetes.api.model.ServicePort;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.var;
-import org.microbean.kubernetes.controller.AbstractEvent;
+import fr.xenogenics.kubernetes.controller.AbstractEvent;
 
 public class MockServiceCoordinator implements IServiceCoordinator {
 

@@ -26,7 +26,7 @@ import com.ibm.streams.platform.services.StreamPropertyNamesType;
 import com.ibm.streams.platform.services.StreamPropertyType;
 import java.util.stream.Collectors;
 import lombok.var;
-import org.microbean.kubernetes.controller.AbstractEvent;
+import fr.xenogenics.kubernetes.controller.AbstractEvent;
 
 public class MockExportCoordinator implements IExportCoordinator {
 

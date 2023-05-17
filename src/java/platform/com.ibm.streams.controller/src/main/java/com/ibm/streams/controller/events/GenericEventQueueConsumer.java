@@ -22,8 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import lombok.var;
-import org.microbean.kubernetes.controller.AbstractEvent;
-import org.microbean.kubernetes.controller.ResourceTrackingEventQueueConsumer;
+import fr.xenogenics.kubernetes.controller.AbstractEvent;
+import fr.xenogenics.kubernetes.controller.ResourceTrackingEventQueueConsumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

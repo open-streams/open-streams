@@ -133,8 +133,8 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.microbean</groupId>
-      <artifactId>microbean-kubernetes-controller</artifactId>
+      <groupId>fr.xenogenics</groupId>
+      <artifactId>kubernetes-controller</artifactId>
     </dependency>
     <dependency>
       <groupId>com.squareup.okhttp3</groupId>

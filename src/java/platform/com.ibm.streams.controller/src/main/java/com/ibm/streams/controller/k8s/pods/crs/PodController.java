@@ -37,8 +37,8 @@ import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import java.io.IOException;
 import java.util.Set;
-import org.microbean.kubernetes.controller.AbstractEvent;
-import org.microbean.kubernetes.controller.Controller;
+import fr.xenogenics.kubernetes.controller.AbstractEvent;
+import fr.xenogenics.kubernetes.controller.Controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

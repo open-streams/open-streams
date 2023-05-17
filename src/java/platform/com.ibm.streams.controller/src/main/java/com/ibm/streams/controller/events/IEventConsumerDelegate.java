@@ -17,7 +17,7 @@
 package com.ibm.streams.controller.events;
 
 import io.fabric8.kubernetes.api.model.HasMetadata;
-import org.microbean.kubernetes.controller.AbstractEvent;
+import fr.xenogenics.kubernetes.controller.AbstractEvent;
 
 public interface IEventConsumerDelegate<T extends HasMetadata> {
 
