@@ -1,5 +1,6 @@
 /*
  * Copyright 2021 IBM Corporation
+ * Copyright 2023 Xenogenics
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,20 +61,27 @@ public class KubernetesBundleLoader implements IBundleLoader {
     return content;
   }
 
+  private Optional<byte[]> loadHttpSource(BundleSpec spec, String namespace) {
+    return BundleUtils.loadBundleFromUrl(
+        spec.getName(), spec.getHttp().getUrl(), spec.getPullPolicy(), namespace);
+  }
+
   @Override
   public Optional<Bundle> load(BundleSpec spec, String namespace) {
     Optional<byte[]> result = Optional.empty();
     /*
-     * Get the content direcly from Redis or from Github.
+     * Get the content direcly from Redis or from GitHub.
      */
-    if (spec.getFile() != null && spec.getGithub() != null) {
-      LOGGER.error("Options bundle.file and bundle.github are mutually exclusive");
-    } else if (spec.getFile() == null && spec.getGithub() == null) {
+    if (spec.getFile() != null && spec.getGithub() != null && spec.getHttp() != null) {
+      LOGGER.error("Bundle source options are mutually exclusive");
+    } else if (spec.getFile() == null && spec.getGithub() == null && spec.getHttp() == null) {
       result = BundleUtils.loadBundleFromRedis(spec.getName(), namespace);
     } else if (spec.getFile() != null) {
       result = loadFileSource(spec, namespace);
     } else if (spec.getGithub() != null) {
       result = loadGithubSource(spec, namespace);
+    } else {
+      result = loadHttpSource(spec, namespace);
     }
     /*
      * Invalid bundle.

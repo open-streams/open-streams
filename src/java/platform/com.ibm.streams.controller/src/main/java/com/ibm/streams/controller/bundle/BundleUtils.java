@@ -1,5 +1,6 @@
 /*
  * Copyright 2021 IBM Corporation
+ * Copyright 2023 Xenogenics
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -110,7 +111,7 @@ public class BundleUtils {
     }
   }
 
-  private static Optional<byte[]> loadBundleFromGithub(Request request) {
+  private static Optional<byte[]> loadBundleFromRequest(Request request) {
     Optional<byte[]> result = Optional.empty();
     /*
      * Try to fetch the bundle.
@@ -193,7 +194,7 @@ public class BundleUtils {
      */
     var request =
         new Request.Builder().url(url).addHeader("Accept", "application/vnd.github.v3.raw").build();
-    var result = loadBundleFromGithub(request);
+    var result = loadBundleFromRequest(request);
     result.ifPresent(
         v -> {
           LOGGER.info("Bundle {} successfully loaded from {}", name, url);
@@ -220,7 +221,30 @@ public class BundleUtils {
             .addHeader("Authorization", "token " + secret)
             .addHeader("Accept", "application/vnd.github.v3.raw")
             .build();
-    var result = loadBundleFromGithub(request);
+    var result = loadBundleFromRequest(request);
+    result.ifPresent(
+        v -> {
+          LOGGER.info("Bundle {} successfully loaded from {}", name, url);
+          storeBundleToRedis(name, v, ns);
+        });
+    return result;
+  }
+
+  public static Optional<byte[]> loadBundleFromUrl(
+      String name, String url, EBundlePullPolicy pullPolicy, String ns) {
+    /*
+     * Evaluate the pull policy.
+     */
+    if (pullPolicy == EBundlePullPolicy.IfNotPresent && isBundleInRedis(name, ns)) {
+      LOGGER.info("Bundle {} already present in the repository", name);
+      return loadBundleFromRedis(name, ns);
+    }
+    /*
+     * Perform the request.
+     */
+    var request =
+        new Request.Builder().url(url).addHeader("Accept", "application/octet-stream").build();
+    var result = loadBundleFromRequest(request);
     result.ifPresent(
         v -> {
           LOGGER.info("Bundle {} successfully loaded from {}", name, url);
