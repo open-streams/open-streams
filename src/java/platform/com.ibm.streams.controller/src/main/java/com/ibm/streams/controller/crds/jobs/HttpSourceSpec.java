@@ -1,5 +1,4 @@
 /*
- * Copyright 2021 IBM Corporation
  * Copyright 2023 Xenogenics
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,29 +17,18 @@
 package com.ibm.streams.controller.crds.jobs;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.ibm.streams.controller.bundle.EBundlePullPolicy;
 import io.fabric8.kubernetes.api.model.KubernetesResource;
 import lombok.Getter;
 import lombok.Setter;
 
 @JsonDeserialize
-public class BundleSpec implements KubernetesResource {
+public class HttpSourceSpec implements KubernetesResource {
 
-  @Getter @Setter private String name;
-  @Getter @Setter private EBundlePullPolicy pullPolicy;
-  @Getter @Setter private GithubSourceSpec github;
-  @Getter @Setter private FileSourceSpec file;
-  @Getter @Setter private HttpSourceSpec http;
+  @Getter @Setter private String url;
 
-  public BundleSpec() {
-    this.pullPolicy = EBundlePullPolicy.IfNotPresent;
-  }
+  public HttpSourceSpec() {}
 
-  public BundleSpec(BundleSpec spec) {
-    this.name = spec.name;
-    this.pullPolicy = spec.pullPolicy;
-    this.github = spec.github != null ? new GithubSourceSpec(spec.github) : null;
-    this.file = spec.file != null ? new FileSourceSpec(spec.file) : null;
-    this.http = spec.http != null ? new HttpSourceSpec(spec.http) : null;
+  public HttpSourceSpec(HttpSourceSpec spec) {
+    this.url = spec.url;
   }
 }
