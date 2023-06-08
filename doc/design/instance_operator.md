@@ -96,11 +96,18 @@ of a job defines the properties of bundle to be used. The options are:
 |:-----|:-----|:------------|
 | `name` | `string` | The bundle name |
 | `pullPolicy` | `enum` | Either `IfNotPresent` or `Always`, default is `IfNotPresent` |
+| `http` | `dictionary` |  A `HttpSource` object |
 | `file` | `dictionary` |  A `FileSource` object |
 | `github` | `dictionary` |  A `GithubSource` object |
 
 The `name` option is mandatory. The `file` and `github` options are mutually
 exclusive.
+
+##### HttpSource
+
+| Name | Type | Description |
+|:-----|:-----|:------------|
+| `url` | `string` | An external URL pointing to the bundle to be fetched |
 
 ##### FileSource
 
