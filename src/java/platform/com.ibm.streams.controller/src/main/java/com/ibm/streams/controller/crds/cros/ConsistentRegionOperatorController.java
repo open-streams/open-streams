@@ -21,12 +21,12 @@ import com.ibm.streams.controller.k8s.deployments.DeploymentFactory;
 import com.ibm.streams.controller.k8s.services.ServiceFactory;
 import com.ibm.streams.controller.k8s.utils.TimeUtils;
 import com.ibm.streams.controller.utils.CommonEnvironment;
+import fr.xenogenics.kubernetes.controller.AbstractEvent;
+import fr.xenogenics.kubernetes.controller.Controller;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import java.io.IOException;
 import java.time.Instant;
 import lombok.var;
-import fr.xenogenics.kubernetes.controller.AbstractEvent;
-import fr.xenogenics.kubernetes.controller.Controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

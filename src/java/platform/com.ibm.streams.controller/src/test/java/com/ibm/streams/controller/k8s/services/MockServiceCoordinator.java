@@ -18,12 +18,12 @@ package com.ibm.streams.controller.k8s.services;
 
 import com.ibm.streams.controller.crds.jobs.Job;
 import com.ibm.streams.controller.instance.sam.InputPortLabel;
+import fr.xenogenics.kubernetes.controller.AbstractEvent;
 import io.fabric8.kubernetes.api.model.Service;
 import io.fabric8.kubernetes.api.model.ServicePort;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.var;
-import fr.xenogenics.kubernetes.controller.AbstractEvent;
 
 public class MockServiceCoordinator implements IServiceCoordinator {
 

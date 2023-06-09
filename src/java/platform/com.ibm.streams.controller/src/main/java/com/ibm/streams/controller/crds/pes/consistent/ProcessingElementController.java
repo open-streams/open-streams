@@ -27,11 +27,11 @@ import com.ibm.streams.controller.crds.pes.ProcessingElement;
 import com.ibm.streams.controller.crds.pes.ProcessingElementList;
 import com.ibm.streams.controller.crds.pes.ProcessingElementStore;
 import com.ibm.streams.controller.events.GenericEventQueueConsumer;
+import fr.xenogenics.kubernetes.controller.AbstractEvent;
+import fr.xenogenics.kubernetes.controller.Controller;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import java.io.IOException;
 import java.util.Set;
-import fr.xenogenics.kubernetes.controller.AbstractEvent;
-import fr.xenogenics.kubernetes.controller.Controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

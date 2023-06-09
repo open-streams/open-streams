@@ -79,6 +79,7 @@ import com.ibm.streams.mock.MockEnvironment;
 import com.ibm.streams.mock.MockResourceBase;
 import com.ibm.streams.mock.server.KubernetesServer;
 import com.ibm.streams.utils.Probe;
+import fr.xenogenics.kubernetes.controller.Controller;
 import io.fabric8.kubernetes.api.model.ConfigMap;
 import io.fabric8.kubernetes.api.model.ConfigMapList;
 import io.fabric8.kubernetes.api.model.Pod;
@@ -102,7 +103,6 @@ import java.util.concurrent.TimeUnit;
 import lombok.var;
 import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
-import fr.xenogenics.kubernetes.controller.Controller;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
 public class MockResource extends MockResourceBase {

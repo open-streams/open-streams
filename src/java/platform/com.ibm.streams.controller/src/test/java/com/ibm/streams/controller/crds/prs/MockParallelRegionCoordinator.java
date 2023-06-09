@@ -19,8 +19,8 @@ package com.ibm.streams.controller.crds.prs;
 import static com.ibm.streams.controller.crds.ICustomResourceCommons.STREAMS_GENERATION_LABEL_KEY;
 
 import com.ibm.streams.controller.crds.jobs.Job;
-import java.math.BigInteger;
 import fr.xenogenics.kubernetes.controller.AbstractEvent;
+import java.math.BigInteger;
 
 public class MockParallelRegionCoordinator implements IParallelRegionCoordinator {
 
