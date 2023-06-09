@@ -25,13 +25,13 @@ import static com.ibm.streams.controller.crds.ICustomResourceCommons.STREAMS_PE_
 import com.ibm.streams.controller.crds.jobs.JobStore;
 import com.ibm.streams.controller.events.GenericEventQueueConsumer;
 import com.ibm.streams.controller.k8s.utils.ResourceUtils;
+import fr.xenogenics.kubernetes.controller.AbstractEvent;
+import fr.xenogenics.kubernetes.controller.Controller;
 import io.fabric8.kubernetes.api.model.Service;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import java.io.IOException;
 import java.math.BigInteger;
 import lombok.var;
-import fr.xenogenics.kubernetes.controller.AbstractEvent;
-import fr.xenogenics.kubernetes.controller.Controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

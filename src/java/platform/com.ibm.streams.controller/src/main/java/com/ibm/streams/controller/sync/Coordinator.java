@@ -17,13 +17,13 @@
 package com.ibm.streams.controller.sync;
 
 import com.ibm.streams.controller.events.IEventConsumerDelegate;
+import fr.xenogenics.kubernetes.controller.AbstractEvent;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
 import lombok.var;
-import fr.xenogenics.kubernetes.controller.AbstractEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

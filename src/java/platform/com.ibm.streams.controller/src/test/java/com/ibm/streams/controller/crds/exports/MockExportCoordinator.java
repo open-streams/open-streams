@@ -24,9 +24,9 @@ import com.ibm.streams.instance.sam.model.topology.StreamProperty;
 import com.ibm.streams.platform.services.StreamPropertiesType;
 import com.ibm.streams.platform.services.StreamPropertyNamesType;
 import com.ibm.streams.platform.services.StreamPropertyType;
+import fr.xenogenics.kubernetes.controller.AbstractEvent;
 import java.util.stream.Collectors;
 import lombok.var;
-import fr.xenogenics.kubernetes.controller.AbstractEvent;
 
 public class MockExportCoordinator implements IExportCoordinator {
 

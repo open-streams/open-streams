@@ -21,8 +21,8 @@ import static com.ibm.streams.controller.crds.ICustomResourceCommons.STREAMS_GEN
 import com.ibm.streams.controller.crds.jobs.Job;
 import com.ibm.streams.controller.instance.broker.ImportExportCommons;
 import com.ibm.streams.platform.services.ImportedStreamsType;
-import lombok.var;
 import fr.xenogenics.kubernetes.controller.AbstractEvent;
+import lombok.var;
 
 public class MockImportCoordinator implements IImportCoordinator {
 

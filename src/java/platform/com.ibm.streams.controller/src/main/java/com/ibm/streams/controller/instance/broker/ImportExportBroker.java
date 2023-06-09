@@ -35,6 +35,7 @@ import com.ibm.streams.controller.utils.CommonEnvironment;
 import com.ibm.streams.instance.sam.model.DynamicConnIpSubs;
 import com.ibm.streams.instance.sam.model.DynamicConnOpProps;
 import com.ibm.streams.instance.sam.model.topology.StreamProperty;
+import fr.xenogenics.kubernetes.controller.AbstractEvent;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import java.math.BigInteger;
 import java.net.DatagramSocket;
@@ -49,7 +50,6 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.var;
-import fr.xenogenics.kubernetes.controller.AbstractEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

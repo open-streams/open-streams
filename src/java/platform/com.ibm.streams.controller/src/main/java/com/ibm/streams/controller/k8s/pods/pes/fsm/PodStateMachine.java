@@ -38,6 +38,7 @@ import com.ibm.streams.controller.k8s.pods.PodStore;
 import com.ibm.streams.controller.k8s.pods.pes.PodSpecBuilder;
 import com.ibm.streams.controller.utils.CommonEnvironment;
 import com.ibm.streams.controller.utils.OperationInProgressException;
+import fr.xenogenics.kubernetes.controller.AbstractEvent;
 import io.fabric8.kubernetes.api.model.ConfigMap;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.client.KubernetesClient;
@@ -51,7 +52,6 @@ import java.util.function.Supplier;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.var;
-import fr.xenogenics.kubernetes.controller.AbstractEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
