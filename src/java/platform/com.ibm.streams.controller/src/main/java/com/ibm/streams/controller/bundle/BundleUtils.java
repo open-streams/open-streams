@@ -154,7 +154,7 @@ public class BundleUtils {
     return loadBundleFromRequestWithClient(request, client);
   }
 
-  private static Optional<byte[]> loadBundleFromRequest(Request request, String ca) {
+  private static Optional<byte[]> loadBundleFromRequest(Request request, String alias, String ca) {
     X509Certificate certificate;
     KeyStore keyStore;
     TrustManagerFactory tmFactory;
@@ -176,7 +176,7 @@ public class BundleUtils {
     try {
       keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
       keyStore.load(null);
-      keyStore.setCertificateEntry("caCert", certificate);
+      keyStore.setCertificateEntry(alias, certificate);
     } catch (CertificateException
         | IOException
         | KeyStoreException
@@ -328,7 +328,7 @@ public class BundleUtils {
   }
 
   public static Optional<byte[]> loadBundleFromUrl(
-      String name, String url, String ca, EBundlePullPolicy pullPolicy, String ns) {
+      String name, String url, String alias, String ca, EBundlePullPolicy pullPolicy, String ns) {
     /*
      * Evaluate the pull policy.
      */
@@ -341,7 +341,7 @@ public class BundleUtils {
      */
     var request =
         new Request.Builder().url(url).addHeader("Accept", "application/octet-stream").build();
-    var result = loadBundleFromRequest(request, ca);
+    var result = loadBundleFromRequest(request, alias, ca);
     result.ifPresent(
         v -> {
           LOGGER.info("Bundle {} successfully loaded from {}", name, url);

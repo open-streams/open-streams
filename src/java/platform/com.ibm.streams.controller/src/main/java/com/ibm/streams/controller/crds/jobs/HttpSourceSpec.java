@@ -31,6 +31,9 @@ public class HttpSourceSpec implements KubernetesResource {
 
   public HttpSourceSpec(HttpSourceSpec spec) {
     this.url = spec.url;
-    this.certificationAuthority = spec.certificationAuthority;
+    this.certificationAuthority =
+        spec.certificationAuthority != null
+            ? new CertificationAuthoritySpec(spec.certificationAuthority)
+            : null;
   }
 }

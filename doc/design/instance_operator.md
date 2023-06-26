@@ -64,62 +64,73 @@ spec:
 
 A job `spec` accepts the following configuration:
 
-| Name | Type | Description | Default |
-|:-----|:-----|:------------|:--------|
-| `bundle` | `dictionary` | [Bundle](#bundle) options | |
-| `fusion` | `dictionary` | [Fusion](#fusion) options | |
-| `imagePullPolicy` | `string` | `Always` or `IfNotPresent` | `Always` |
-| `imagePullSecret` | `string` | Name of the Streams runtime image pull secret| `Always` |
-| `processingElement` | `dictionary` | [Processing element](#processing-element) options | |
-| `submissionTimeOutInSeconds` | `integer` | Submission time-out in seconds | `300` |
-| `submissionTimeValues` | `dictionary` | Submission-time values | `null` |
-| `threadingModel` | `dictionary` | [Threading model](#threading-model) options | |
-| `transportCertificateValidityInDays` | `integer` | Validity period for the TLS certificate | 30 |
-| `resources` | `dictionary` | [Compute resource](https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/) options | |
+| Name                                 | Type         | Description                                                                                                       | Default  |
+|:-------------------------------------|:-------------|:------------------------------------------------------------------------------------------------------------------|:---------|
+| `bundle`                             | `dictionary` | [Bundle](#bundle) options                                                                                         |          |
+| `fusion`                             | `dictionary` | [Fusion](#fusion) options                                                                                         |          |
+| `imagePullPolicy`                    | `string`     | `Always` or `IfNotPresent`                                                                                        | `Always` |
+| `imagePullSecret`                    | `string`     | Name of the Streams runtime image pull secret                                                                     | `Always` |
+| `processingElement`                  | `dictionary` | [Processing element](#processing-element) options                                                                 |          |
+| `submissionTimeOutInSeconds`         | `integer`    | Submission time-out in seconds                                                                                    | `300`    |
+| `submissionTimeValues`               | `dictionary` | Submission-time values                                                                                            | `null`   |
+| `threadingModel`                     | `dictionary` | [Threading model](#threading-model) options                                                                       |          |
+| `transportCertificateValidityInDays` | `integer`    | Validity period for the TLS certificate                                                                           | 30       |
+| `resources`                          | `dictionary` | [Compute resource](https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/) options |          |
 
 The `resource` option can be used to define a job-wide resource request. It is
 empty by default. The table below summarizes how this request is handled:
 
-| Job has `resource` | PE has `resource` | Behavior | |:--:|:--:|:-| | 𐄂 | 𐄂 |
-PEs use their defaults **regardless of their count** | | 𐄂 | ✓ | PEs use the
-specified PE requests **regardless of their count** | | ✓ | 𐄂 | PEs use the
-specified Job requests **divided by their count** | | ✓ | ✓ | PEs use the
-specified Job requests **divided by their count** |
+| Job has `resource` | PE has `resource` | Behavior                                                        |
+|:------------------:|:-----------------:|:----------------------------------------------------------------|
+|         𐄂         |        𐄂         | PEs use their defaults **regardless of their count**            |
+|         𐄂         |         ✓         | PEs use the specified PE requests **regardless of their count** |
+|         ✓          |        𐄂         | PEs use the specified Job requests **divided by their count**   |
+|         ✓          |         ✓         | PEs use the specified Job requests **divided by their count**   |
 
 #### Bundle
 
 Application bundles are fetched remotely from an URL and cached locally. A
-bundle `spec`
-of a job defines the properties of bundle to be used. The options are:
+bundle `spec` of a job defines the properties of bundle to be used. The options are:
 
-| Name | Type | Description |
-|:-----|:-----|:------------|
-| `name` | `string` | The bundle name |
-| `pullPolicy` | `enum` | Either `IfNotPresent` or `Always`, default is `IfNotPresent` |
-| `http` | `dictionary` |  A `HttpSource` object |
-| `file` | `dictionary` |  A `FileSource` object |
-| `github` | `dictionary` |  A `GithubSource` object |
+| Name         | Type         | Description                                                  |
+|:-------------|:-------------|:-------------------------------------------------------------|
+| `name`       | `string`     | The bundle name                                              |
+| `pullPolicy` | `enum`       | Either `IfNotPresent` or `Always`, default is `IfNotPresent` |
+| `http`       | `dictionary` | A `HttpSource` object                                        |
+| `file`       | `dictionary` | A `FileSource` object                                        |
+| `github`     | `dictionary` | A `GithubSource` object                                      |
 
 The `name` option is mandatory. The `file` and `github` options are mutually
 exclusive.
 
 ##### HttpSource
 
-| Name | Type | Description |
-|:-----|:-----|:------------|
-| `url` | `string` | An external URL pointing to the bundle to be fetched |
+| Name                     | Type         | Description                                          |
+|:-------------------------|:-------------|:-----------------------------------------------------|
+| `url`                    | `string`     | An external URL pointing to the bundle to be fetched |
+| `certificationAuthority` | `dictionary` | A `CertificationAuthority` object                    |
+
+###### CertificationAuthority
+
+With a `CertificationAuthority` entry, the user can specify a non-standard root
+certificate to be used with the HTTP request.
+
+| Name            | Type         | Description                                                |
+|:----------------|:-------------|:-----------------------------------------------------------|
+| `configMapName` | `string`     | The name of the ConfigMap with the certificate             |
+| `subPath`       | `dictionary` | The path in the ConfigMap at which to find the certificate |
 
 ##### FileSource
 
-| Name | Type | Description |
-|:-----|:-----|:------------|
+| Name   | Type     | Description                                       |
+|:-------|:---------|:--------------------------------------------------|
 | `path` | `string` | A local path pointing to the bundle to be fetched |
 
 ##### GithubSource
 
-| Name | Type | Description |
-|:-----|:-----|:------------|
-| `url` | `string` | An external URL pointing to the bundle to be fetched |
+| Name     | Type      | Description                                                            |
+|:---------|:----------|:-----------------------------------------------------------------------|
+| `url`    | `string`  | An external URL pointing to the bundle to be fetched                   |
 | `secret` | `integer` | A secret containing the GitHub personal token required to access `url` |
 
 The `url` option is mandatory. If `secret` is specified, the `url` field must be
@@ -138,21 +149,21 @@ the `url` option is specified.
 A fusion `spec` of a job controls how the controller fuses operators into PEs.
 The options are:
 
-| Name | Type | Description |
-|:-----|:-----|:------------|
-| `type` | `enum` | Type of fusion within parallel regions |
+| Name        | Type      | Description                                          |
+|:------------|:----------|:-----------------------------------------------------|
+| `type`      | `enum`    | Type of fusion within parallel regions               |
 | `automatic` | `boolean` | `true` enables automatic fusion, `false` disables it |
-| `legacy` | `boolean` | `true` enables legacy fusion, `false` disables it |
-| `manual` | `integer` | Manually specifies number of PEs |
+| `legacy`    | `boolean` | `true` enables legacy fusion, `false` disables it    |
+| `manual`    | `integer` | Manually specifies number of PEs                     |
 
 The `type` option specifies the behavior of the fusion within parallel regions.
 It can be left unset or set to one of these values:
 
-| Name | Description |
-|:-----|:------------|
-| `noChannelInfluence` | Operators in parallel regions are treated like any other |
-| `channelIsolation` | Operators in parallel regions are fused together per-channel |
-| `channelExlocation` | Operators in parallel regions from different channels are not fused together|
+| Name                 | Description                                                                  |
+|:---------------------|:-----------------------------------------------------------------------------|
+| `noChannelInfluence` | Operators in parallel regions are treated like any other                     |
+| `channelIsolation`   | Operators in parallel regions are fused together per-channel                 |
+| `channelExlocation`  | Operators in parallel regions from different channels are not fused together |
 
 The `automatic`, `legacy`, and `manual` options are mutually exclusive. It is a
 logical error to request more than one kind of fusion.
@@ -161,12 +172,12 @@ logical error to request more than one kind of fusion.
 
 A threading model `spec` accepts the following configuration:
 
-| Name | Type | Description |
-|:-----|:-----|:------------|
-| `automatic` | `boolean` | Use automatic fusion |
-| `dedicated` | `boolean` | Use dedicated fusion |
-| `dynamic` | `dictionary` | [Dynamic threading model](#dynamic-threading-model) |
-| `manual` | `boolean` | Use manual fusion |
+| Name        | Type         | Description                                         |
+|:------------|:-------------|:----------------------------------------------------|
+| `automatic` | `boolean`    | Use automatic fusion                                |
+| `dedicated` | `boolean`    | Use dedicated fusion                                |
+| `dynamic`   | `dictionary` | [Dynamic threading model](#dynamic-threading-model) |
+| `manual`    | `boolean`    | Use manual fusion                                   |
 
 These options are mutually exclusive. It is a logical error to request more than
 one threading model.
@@ -175,9 +186,9 @@ one threading model.
 
 A dynamic threading model `spec` accepts the following configuration:
 
-| Name | Type | Description |
-|:-----|:-----|:------------|
-| `elastic` | `boolean` | Use elastic threading |
+| Name          | Type      | Description              |
+|:--------------|:----------|:-------------------------|
+| `elastic`     | `boolean` | Use elastic threading    |
 | `threadCount` | `integer` | Number of threads to use |
 
 ### Processing element
@@ -192,24 +203,24 @@ count.
 
 ##### Image and runtime
 
-| Name | Type | Description | Default |
-|:-----|:-----|:------------|:--------|
-| `buildType` | `string` | Build type of the runtime, either `debug` or `release` | `debug` |
-| `imagePullPolicy` | `string` | `Always` or `IfNotPresent` | Inherited |
-| `imagePullSecret` | `string` | Name of the Streams runtime image pull secret| Inherited |
-| `sabName` | `string` | Name of the SAB to use | Inherited |
-| `transportSecurityType` | `string` | `none` or `TLSv1.2` | `none` |
-| `resources` | `dictionary` | [Compute resource](https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/) options | No `limits`, `requests` is `100m` for `cpu` and `128Mi` for `memory` |
+| Name                    | Type         | Description                                                                                                       | Default                                                              |
+|:------------------------|:-------------|:------------------------------------------------------------------------------------------------------------------|:---------------------------------------------------------------------|
+| `buildType`             | `string`     | Build type of the runtime, either `debug` or `release`                                                            | `debug`                                                              |
+| `imagePullPolicy`       | `string`     | `Always` or `IfNotPresent`                                                                                        | Inherited                                                            |
+| `imagePullSecret`       | `string`     | Name of the Streams runtime image pull secret                                                                     | Inherited                                                            |
+| `sabName`               | `string`     | Name of the SAB to use                                                                                            | Inherited                                                            |
+| `transportSecurityType` | `string`     | `none` or `TLSv1.2`                                                                                               | `none`                                                               |
+| `resources`             | `dictionary` | [Compute resource](https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/) options | No `limits`, `requests` is `100m` for `cpu` and `128Mi` for `memory` |
 
 ##### Debugging
 
 The _debug_ version of the runtime ships with `valgrind`. It is possible to run
 the PE runtime process in a `valgrind` context with the following options:
 
-| Name | Type | Description | Default |
-|:-----|:-----|:------------|:--------|
-| `allowPtrace` | `boolean` | Enable the `SYS_PTRACE` capability in Docker | `false `|
-| `runWithValgrind` | `boolean` | Implies `buildType = debug` and  `allowPtrace = true` | `false` |
+| Name              | Type      | Description                                           | Default  |
+|:------------------|:----------|:------------------------------------------------------|:---------|
+| `allowPtrace`     | `boolean` | Enable the `SYS_PTRACE` capability in Docker          | `false ` |
+| `runWithValgrind` | `boolean` | Implies `buildType = debug` and  `allowPtrace = true` | `false`  |
 
 The _debug_ image also contains `gdb`. The `allowPtrace` option is required to
 attach the PE process inside `gdb`.
@@ -222,10 +233,10 @@ messages coming from the SPL application (`appLog` and `appTrc`) or native
 operators (with the `SPLAPPTRC` macro). The runtime domain covers log and trace
 messages coming from the runtime (with the `SPCDBG` macro).
 
-| Name | Type | Description | Default |
-|:-----|:-----|:------------|:--------------|
-| `appTraceLevel` | `string` | Level of tracing for the application | `null` |
-| `runtimeTraceLevel` | `string` | Level of tracing for the runtime | `INFO` |
+| Name                | Type     | Description                          | Default |
+|:--------------------|:---------|:-------------------------------------|:--------|
+| `appTraceLevel`     | `string` | Level of tracing for the application | `null`  |
+| `runtimeTraceLevel` | `string` | Level of tracing for the runtime     | `INFO`  |
 
 The `appTraceLevel` option sets the level for the application domain. Unset by
 default, the level defined in the AADL is used. When set, the specified value
@@ -252,12 +263,12 @@ so wish.
 The table below summarizes the various scenarios where a pod can be restarted in
 Knative Streams:
 
-| Name | Type | Description | Default |
-|:-----|:-----|:------------|:--------------|
-| `deleteFailedPod` | `boolean` | Delete failed pods | `true` |
-| `restartCompletedPod` | `boolean` | Restart completed pods | `false` |
-| `restartDeletedPod` | `boolean` | Restart manually deleted pods | `false` |
-| `restartFailedPod` | `Boolean` | Restart failed pods | `null `|
+| Name                  | Type      | Description                   | Default |
+|:----------------------|:----------|:------------------------------|:--------|
+| `deleteFailedPod`     | `boolean` | Delete failed pods            | `true`  |
+| `restartCompletedPod` | `boolean` | Restart completed pods        | `false` |
+| `restartDeletedPod`   | `boolean` | Restart manually deleted pods | `false` |
+| `restartFailedPod`    | `Boolean` | Restart failed pods           | `null ` |
 
 The `restartCompletedPod` option covers the internal, explicit and implicit
 shutdown situations. When `false`, pods that terminate with a
@@ -283,66 +294,66 @@ would continuously fail, by inspecting their logs for instance.
 
 ##### Liveness probe
 
-| Name | Type | Description | Default |
-|:-----|:-----|:------------|:--------------|
-| `initialProbeDelayInSeconds` | `integer` | Initial delay for the PE liveness probe | `30` |
-| `probeFailureThreshold` | `integer` | Number of retries before a PE is killed by its liveness probe | `1` |
-| `probeIntervalInSeconds` | `integer` | Probing interval for the PE liveness probe | `10` |
+| Name                         | Type      | Description                                                   | Default |
+|:-----------------------------|:----------|:--------------------------------------------------------------|:--------|
+| `initialProbeDelayInSeconds` | `integer` | Initial delay for the PE liveness probe                       | `30`    |
+| `probeFailureThreshold`      | `integer` | Number of retries before a PE is killed by its liveness probe | `1`     |
+| `probeIntervalInSeconds`     | `integer` | Probing interval for the PE liveness probe                    | `10`    |
 
 ##### Data directory configuration
 
-| Name | Type | Description | Default |
-|:-----|:-----|:------------|:--------------|
-| `dataPath` | `string` | Override `STREAMS_DATA_PATH` setup in the controller YAML | `null` |
-| `dataVolumeClaim` | `dictionary` | [Data volume claim](#data-volume-claim) | `null` |
+| Name              | Type         | Description                                               | Default |
+|:------------------|:-------------|:----------------------------------------------------------|:--------|
+| `dataPath`        | `string`     | Override `STREAMS_DATA_PATH` setup in the controller YAML | `null`  |
+| `dataVolumeClaim` | `dictionary` | [Data volume claim](#data-volume-claim)                   | `null`  |
 
 ##### Checkpoint configuration
 
-| Name | Type | Description | Default |
-|:-----|:-----|:------------|:--------------|
-| `checkpointRepository` | `dictionary` | [Checkpoint data store](#checkpoint-data-store) | `null` |
+| Name                   | Type         | Description                                     | Default |
+|:-----------------------|:-------------|:------------------------------------------------|:--------|
+| `checkpointRepository` | `dictionary` | [Checkpoint data store](#checkpoint-data-store) | `null`  |
 
 ##### External properties
 
-| Name | Type | Description | Default |
-|:-----|:-----|:------------|:--------|
-| `appPropertiesSecret` | `string` | The name of the secret to use as application properties | `null` |
-| `restrictedPropertiesSecret` | `string` | The name of the secret to use as restricted properties | `null` |
+| Name                         | Type     | Description                                             | Default |
+|:-----------------------------|:---------|:--------------------------------------------------------|:--------|
+| `appPropertiesSecret`        | `string` | The name of the secret to use as application properties | `null`  |
+| `restrictedPropertiesSecret` | `string` | The name of the secret to use as restricted properties  | `null`  |
 
 #### Data volume claim
 
 A data volume claim `spec` accepts the following configuration:
 
-| Name | Type | Description |
-|:-----|:-----|:------------|
-| `name` | `string` | Name of the persistent volume claim |
-| `subPath` | `string` | A path in the claim |
+| Name      | Type     | Description                         |
+|:----------|:---------|:------------------------------------|
+| `name`    | `string` | Name of the persistent volume claim |
+| `subPath` | `string` | A path in the claim                 |
 
 #### Checkpoint data store
 
 A checkpoint data store `spec` accepts the following configuration:
 
-| Name | Type | Description |
-|:-----|:-----|:------------|
+| Name         | Type         | Description                                     |
+|:-------------|:-------------|:------------------------------------------------|
 | `fileSystem` | `dictionary` | [Filesystem data store](#filesystem-data-store) |
-| `redis` | `dictionary` | [Redis data store](#redis-data-store) |
+| `redis`      | `dictionary` | [Redis data store](#redis-data-store)           |
 
 ##### Filesystem data store
 
-| Name | Type | Description |
-|:-----|:-----|:------------|
-| `path` | `string` | The mount path of the checkpoints in PEs |
-| `volumeClaim` | `dictionary` | [Data volume claim](#data-volume-claim) |
+| Name          | Type         | Description                              |
+|:--------------|:-------------|:-----------------------------------------|
+| `path`        | `string`     | The mount path of the checkpoints in PEs |
+| `volumeClaim` | `dictionary` | [Data volume claim](#data-volume-claim)  |
 
 ##### Redis data store
 
-| Name | Type | Description |
-|:-----|:-----|:------------|
-| `replicaCount` | `integer` | The number of replicas to use |
-| `restrictedProperty` | `string` | The restricted property to use as a password for redis |
-| `service` | `string` | The name of the redis service associated to the redis `ReplicaSet` |
-| `shardCount` | `integer` | The number of shards per replica to use |
-| `shuffle` | `boolean` | Shuffle the redis server selection |
+| Name                 | Type      | Description                                                        |
+|:---------------------|:----------|:-------------------------------------------------------------------|
+| `replicaCount`       | `integer` | The number of replicas to use                                      |
+| `restrictedProperty` | `string`  | The restricted property to use as a password for redis             |
+| `service`            | `string`  | The name of the redis service associated to the redis `ReplicaSet` |
+| `shardCount`         | `integer` | The number of shards per replica to use                            |
+| `shuffle`            | `boolean` | Shuffle the redis server selection                                 |
 
 ### Dependencies
 

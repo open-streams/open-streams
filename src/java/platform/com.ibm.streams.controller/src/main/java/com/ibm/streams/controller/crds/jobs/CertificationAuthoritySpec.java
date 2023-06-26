@@ -23,13 +23,13 @@ import lombok.Setter;
 
 @JsonDeserialize
 public class CertificationAuthoritySpec implements KubernetesResource {
-  @Getter @Setter private String configMap;
+  @Getter @Setter private String configMapName;
   @Getter @Setter private String subPath;
 
   public CertificationAuthoritySpec() {}
 
   public CertificationAuthoritySpec(CertificationAuthoritySpec spec) {
-    this.configMap = spec.configMap;
+    this.configMapName = spec.configMapName;
     this.subPath = spec.subPath;
   }
 }
