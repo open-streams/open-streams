@@ -22,18 +22,14 @@ import lombok.Getter;
 import lombok.Setter;
 
 @JsonDeserialize
-public class HttpSourceSpec implements KubernetesResource {
+public class CertificationAuthoritySpec implements KubernetesResource {
+  @Getter @Setter private String configMapName;
+  @Getter @Setter private String subPath;
 
-  @Getter @Setter private String url;
-  @Getter @Setter private CertificationAuthoritySpec certificationAuthority;
+  public CertificationAuthoritySpec() {}
 
-  public HttpSourceSpec() {}
-
-  public HttpSourceSpec(HttpSourceSpec spec) {
-    this.url = spec.url;
-    this.certificationAuthority =
-        spec.certificationAuthority != null
-            ? new CertificationAuthoritySpec(spec.certificationAuthority)
-            : null;
+  public CertificationAuthoritySpec(CertificationAuthoritySpec spec) {
+    this.configMapName = spec.configMapName;
+    this.subPath = spec.subPath;
   }
 }

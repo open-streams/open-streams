@@ -17,10 +17,20 @@
 
 package com.ibm.streams.controller.bundle;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.security.KeyManagementException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 import java.util.Optional;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManagerFactory;
 import lombok.var;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -42,8 +52,7 @@ public class BundleUtils {
      * Try to fetch the SAB from redis. Retries for 30 seconds.
      */
     for (int i = 0; i < 30; i += 1) {
-      try {
-        Jedis jedis = new Jedis(host);
+      try (Jedis jedis = new Jedis(host)) {
         /*
          * Connect to the repository and check if the file exists.
          */
@@ -75,8 +84,7 @@ public class BundleUtils {
      * Try to store the SAB to redis. Retries for 30 seconds.
      */
     for (int i = 0; i < 30; i += 1) {
-      try {
-        var jedis = new Jedis(host);
+      try (Jedis jedis = new Jedis(host)) {
         return jedis.hexists("apps", name);
       } catch (JedisConnectionException e) {
         LOGGER.error("Jedis connection exception: {}", e.getMessage());
@@ -95,8 +103,7 @@ public class BundleUtils {
      * Try to store the SAB to redis. Retries for 30 seconds.
      */
     for (int i = 0; i < 30; i += 1) {
-      try {
-        var jedis = new Jedis(host);
+      try (Jedis jedis = new Jedis(host)) {
         var status = jedis.hset("apps".getBytes(), name.getBytes(), content);
         LOGGER.info(
             "Bundle {} has been {} in the repository", name, status == 0 ? "updated" : "stored");
@@ -111,13 +118,13 @@ public class BundleUtils {
     }
   }
 
-  private static Optional<byte[]> loadBundleFromRequest(Request request) {
+  private static Optional<byte[]> loadBundleFromRequestWithClient(
+      Request request, OkHttpClient client) {
     Optional<byte[]> result = Optional.empty();
     /*
      * Try to fetch the bundle.
      */
     try {
-      var client = new OkHttpClient().newBuilder().build();
       var response = client.newCall(request).execute();
       /*
        * Load the bundle.
@@ -140,6 +147,73 @@ public class BundleUtils {
      * Return the result.
      */
     return result;
+  }
+
+  private static Optional<byte[]> loadBundleFromRequest(Request request) {
+    var client = new OkHttpClient().newBuilder().build();
+    return loadBundleFromRequestWithClient(request, client);
+  }
+
+  private static Optional<byte[]> loadBundleFromRequest(Request request, String alias, String ca) {
+    X509Certificate certificate;
+    KeyStore keyStore;
+    TrustManagerFactory tmFactory;
+    SSLContext sslContext;
+    /*
+     * Load the certificate.
+     */
+    try {
+      var is = new ByteArrayInputStream(ca.getBytes());
+      var certFactory = CertificateFactory.getInstance("X.509");
+      certificate = (X509Certificate) certFactory.generateCertificate(is);
+    } catch (CertificateException ignored) {
+      LOGGER.error("Invalid custom certificate authority");
+      return Optional.empty();
+    }
+    /*
+     * Create the key store.
+     */
+    try {
+      keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+      keyStore.load(null);
+      keyStore.setCertificateEntry(alias, certificate);
+    } catch (CertificateException
+        | IOException
+        | KeyStoreException
+        | NoSuchAlgorithmException ignored) {
+      LOGGER.error("Failed to load the certificate into a key store");
+      return Optional.empty();
+    }
+    /*
+     * Create the trust factory.
+     */
+    try {
+      tmFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+      tmFactory.init(keyStore);
+    } catch (KeyStoreException | NoSuchAlgorithmException ignored) {
+      LOGGER.error("Failed to create the trust manager");
+      return Optional.empty();
+    }
+    /*
+     * Create the SSL context.
+     */
+    try {
+      sslContext = SSLContext.getInstance("TLS");
+      sslContext.init(null, tmFactory.getTrustManagers(), null);
+    } catch (KeyManagementException | NoSuchAlgorithmException ignored) {
+      LOGGER.error("Failed to create the TLS context");
+      return Optional.empty();
+    }
+    /*
+     * Create the client.
+     */
+    var sockFactory = sslContext.getSocketFactory();
+    @SuppressWarnings("deprecation")
+    var client = new OkHttpClient().newBuilder().sslSocketFactory(sockFactory).build();
+    /*
+     * Execute the request.
+     */
+    return loadBundleFromRequestWithClient(request, client);
   }
 
   public static Optional<byte[]> loadBundleFromFile(
@@ -245,6 +319,29 @@ public class BundleUtils {
     var request =
         new Request.Builder().url(url).addHeader("Accept", "application/octet-stream").build();
     var result = loadBundleFromRequest(request);
+    result.ifPresent(
+        v -> {
+          LOGGER.info("Bundle {} successfully loaded from {}", name, url);
+          storeBundleToRedis(name, v, ns);
+        });
+    return result;
+  }
+
+  public static Optional<byte[]> loadBundleFromUrl(
+      String name, String url, String alias, String ca, EBundlePullPolicy pullPolicy, String ns) {
+    /*
+     * Evaluate the pull policy.
+     */
+    if (pullPolicy == EBundlePullPolicy.IfNotPresent && isBundleInRedis(name, ns)) {
+      LOGGER.info("Bundle {} already present in the repository", name);
+      return loadBundleFromRedis(name, ns);
+    }
+    /*
+     * Perform the request.
+     */
+    var request =
+        new Request.Builder().url(url).addHeader("Accept", "application/octet-stream").build();
+    var result = loadBundleFromRequest(request, alias, ca);
     result.ifPresent(
         v -> {
           LOGGER.info("Bundle {} successfully loaded from {}", name, url);

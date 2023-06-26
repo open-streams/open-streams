@@ -40,30 +40,69 @@ public class KubernetesBundleLoader implements IBundleLoader {
   }
 
   private Optional<byte[]> loadGithubSource(BundleSpec spec, String namespace) {
-    Optional<byte[]> content = Optional.empty();
     if (spec.getGithub().getSecret() == null) {
-      content =
-          BundleUtils.loadBundleFromGithub(
-              spec.getName(), spec.getGithub().getUrl(), spec.getPullPolicy(), namespace);
-    } else {
-      var secret =
-          client.secrets().inNamespace(namespace).withName(spec.getGithub().getSecret()).get();
-      if (secret == null) {
-        LOGGER.error("Cannot find secret {}", spec.getGithub().getSecret());
-      } else if (secret.getData() != null && secret.getData().containsKey("token")) {
-        var token64 = secret.getData().get("token");
-        var token = new String(Base64.getDecoder().decode(token64));
-        content =
-            BundleUtils.loadBundleFromGithub(
-                spec.getName(), spec.getGithub().getUrl(), token, spec.getPullPolicy(), namespace);
-      }
+      return BundleUtils.loadBundleFromGithub(
+          spec.getName(), spec.getGithub().getUrl(), spec.getPullPolicy(), namespace);
     }
-    return content;
+    /*
+     * Fetch the GitHub secret.
+     */
+    var secret =
+        client.secrets().inNamespace(namespace).withName(spec.getGithub().getSecret()).get();
+    if (secret == null) {
+      LOGGER.error("Cannot find secret {}", spec.getGithub().getSecret());
+      return Optional.empty();
+    }
+    if (secret.getData() == null || !secret.getData().containsKey("token")) {
+      return Optional.empty();
+    }
+    /*
+     * Load the bundle with the token.
+     */
+    var token64 = secret.getData().get("token");
+    var token = new String(Base64.getDecoder().decode(token64));
+    return BundleUtils.loadBundleFromGithub(
+        spec.getName(), spec.getGithub().getUrl(), token, spec.getPullPolicy(), namespace);
   }
 
   private Optional<byte[]> loadHttpSource(BundleSpec spec, String namespace) {
+    var http = spec.getHttp();
+    /*
+     * If there is no certificate authority defined, just load the bundle.
+     */
+    if (http.getCertificationAuthority() == null) {
+      return BundleUtils.loadBundleFromUrl(
+          spec.getName(), http.getUrl(), spec.getPullPolicy(), namespace);
+    }
+    /*
+     * Fetch the config map with the certification authority.
+     */
+    var cert = http.getCertificationAuthority();
+    var cmName = cert.getConfigMapName();
+    var subPath = cert.getSubPath();
+    if (cmName == null) {
+      LOGGER.error("Missing config map name in certification authority");
+      return Optional.empty();
+    }
+    if (subPath == null) {
+      LOGGER.error("Missing sub-path in certification authority");
+      return Optional.empty();
+    }
+    var cm = client.configMaps().inNamespace(namespace).withName(cmName).get();
+    if (cm == null) {
+      LOGGER.error("Cannot find config map {}", cmName);
+      return Optional.empty();
+    }
+    if (cm.getData() == null || !cm.getData().containsKey(cert.getSubPath())) {
+      LOGGER.error("No sub-path {} in config map {}", cert.getSubPath(), cert.getConfigMapName());
+      return Optional.empty();
+    }
+    /*
+     * Load the bundle with the certificate.
+     */
+    var content = cm.getData().get(subPath);
     return BundleUtils.loadBundleFromUrl(
-        spec.getName(), spec.getHttp().getUrl(), spec.getPullPolicy(), namespace);
+        spec.getName(), http.getUrl(), subPath, content, spec.getPullPolicy(), namespace);
   }
 
   @Override
