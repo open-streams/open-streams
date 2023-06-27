@@ -31,6 +31,7 @@ import java.security.cert.X509Certificate;
 import java.util.Optional;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.X509TrustManager;
 import lombok.var;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -208,8 +209,8 @@ public class BundleUtils {
      * Create the client.
      */
     var sockFactory = sslContext.getSocketFactory();
-    @SuppressWarnings("deprecation")
-    var client = new OkHttpClient().newBuilder().sslSocketFactory(sockFactory).build();
+    var tm = (X509TrustManager) tmFactory.getTrustManagers()[0];
+    var client = new OkHttpClient().newBuilder().sslSocketFactory(sockFactory, tm).build();
     /*
      * Execute the request.
      */
